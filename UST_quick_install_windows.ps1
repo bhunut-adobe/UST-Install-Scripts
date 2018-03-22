@@ -305,7 +305,7 @@ function FinalizeInstallation ($USTFolder, $openSSLUSTFolder) {
     $wc = New-Object net.webclient
     $wc.DownloadFile($adobeIOCertScriptURL,$adobeIOCertScriptOutputPath)
 
-    echo $adobeIOCertScriptOutputPath
+    #echo $adobeIOCertScriptOutputPath
 
     if(Test-Path $adobeIOCertScriptOutputPath){
 
