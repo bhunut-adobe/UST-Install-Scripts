@@ -38,7 +38,7 @@ Example calls with flags:
 <code>(New-Object System.Net.WebClient).DownloadFile("url-here","${PWD}\inst.ps1"); .\inst.ps1 <b>-cleanpy</b>; rm -Force .\inst.ps1;</code>
 
 ### Ubuntu 12.04 + 
-<b>This script is still under development, use at your own risk</b>
+<b>This script is still under development, additional setup may be required!!</b>
 
 For older versions (12.04), you may need to run this line first to enable the proper security protocols
 
