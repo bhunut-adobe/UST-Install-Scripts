@@ -1,4 +1,4 @@
-# Install Scripts for User Sync Tool
+# Install Scripts for Adobe User Sync Tool
 These scripts will help you install and configure Adobe's User Sync tool.  User Sync runs behind your enterprise firewall on a virtual machine 
 and quietly keeps your named user accounts in sync with your local LDAP compliant directory!
 
