@@ -26,7 +26,7 @@ if(Test-Path $OpenSSL){
                 "-keyout $USTFolder\private.key",
                 "-out $USTFolder\certificate_pub.crt")
 
-    $process = Start-Process -FilePath cmd.exe -ArgumentList $argslist -PassThru -Wait
+    $process = Start-Process -FilePath cmd.exe -ArgumentList $argslist -PassThru -Wait -NoNewWindow
     if($process.ExitCode -eq 0){
         Write-Host "Completed - Certificate located in $USTFolder."
         Pause
