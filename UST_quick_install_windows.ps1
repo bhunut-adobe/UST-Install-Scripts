@@ -26,7 +26,6 @@ $adobeIOCertScriptURL = "https://raw.githubusercontent.com/janssenda-adobe/UST-I
 $Python2URL = "https://www.python.org/ftp/python/2.7.14/python-2.7.14.amd64.msi"
 $Python3URL = "https://www.python.org/ftp/python/3.6.4/python-3.6.4-amd64.exe"
 
-
 # Set global parameters
 # TLS 1.2 protocol enable - required to download from GitHub, does NOT work on Powershell < 3
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -34,11 +33,15 @@ $Python3URL = "https://www.python.org/ftp/python/3.6.4/python-3.6.4-amd64.exe"
 # Temporary download location
 $DownloadFolder = "$env:TEMP\USTDownload"
 
-function printColor ($msg, $color) {
+# UST folder location
+$USTInstallDir = "$PWD\UST_Install"
+
+
+function Print-Color ($msg, $color) {
     Write-Host $msg -ForegroundColor $color
 }
 
-function banner {
+function Banner {
     Param(
         [String]$message,
         [String]$type="Info",
@@ -60,7 +63,7 @@ function banner {
     $messageTop = ("`n" + $msgChar*$charLen + " ${message} " + $msgChar*$charLen)
     $messageBottom = $msgChar*($messageTop.length-1)
 
-    printColor $messageTop $color
+    Print-Color $messageTop $color
 }
 
 
@@ -94,12 +97,11 @@ function Expand-TarGZ() {
 
     try    {
         Start-Process -FilePath $7zpath -ArgumentList "x `"$Path`" -aoa -y -o`"$DownloadFolder`"" -Wait
-        Start-Process -FilePath $7zpath -ArgumentList "x `"$DownloadFolder\$filename`" -aoa -ttar -y -o`"$Output`"" -Wait
-
+        Start-Process -FilePath $7zpath -ArgumentList "x `"$DownloadFolder\$filename`" -aoa -ttar -y -o`"$Output`""
     } catch {
 
-       printColor "Error while extracting $path..." red
-       printColor ("- " + $PSItem.ToString()) red
+       Print-Color "Error while extracting $path..." red
+       Print-Color ("- " + $PSItem.ToString()) red
        $warnings.Add("- " + $PSItem.ToString())
     }
 }
@@ -117,15 +119,15 @@ function Expand-Archive(){
     } elseif ( $Path.Substring($Path.Length-6) -eq "tar.gz" ) {
         Expand-TarGZ -Path $Path -Output $Output
     } else {
-        printColor $Path.Split('\')[-1] red
+        Print-Color $Path.Split('\')[-1] red
         $fmt = $Path.Split('\')[-1]
         throw ("Unrecognized archive format.. $fmt")
     }
 
 }
 
-function pyUninstaller(){
-    banner "Uninstalling Python" -type Info
+function Remove-Python(){
+    Banner "Uninstalling Python" -type Info
     $errors = $false
 
     # Subkeys from registry for managing installed software state
@@ -152,8 +154,8 @@ function pyUninstaller(){
             } else {
                 $errors = $true
                 $errmsg =  "- There was a problem removing ($app)`n- Please remove it manually!"
-                printColor $errmsg red
-                printColor ("- " + $PSItem.ToString()) red
+                Print-Color $errmsg red
+                Print-Color ("- " + $PSItem.ToString()) red
                 $warnings.Add($PSItem.ToString())
 
             }
@@ -173,17 +175,20 @@ function pyUninstaller(){
     if (-not ($matches)){
         Write-Host "- Nothing to uninstall!"
     } elseif ($errors){
-        printColor "`n- Uninstallation completed with some errors..." Yellow
+        Print-Color "`n- Uninstallation completed with some errors..." Yellow
     } else {
-        printColor "`n- Uninstall completed succesfully!" Green
+        Print-Color "`n- Uninstall completed succesfully!" Green
     }
 }
 
-function SetDirectory(){
+function Set-Directories(){
 
-    $USTInstallDir = "$PWD\UST_Install"
+
     Write-Host "- Creating directory $USTInstallDir... "
     New-Item -ItemType Directory -Force -Path $USTInstallDir | Out-Null
+
+    #Create Temp download folder
+    New-Item -Path $DownloadFolder -ItemType "Directory" -Force | Out-Null
 
     return $USTInstallDir
 
@@ -208,8 +213,8 @@ function Get-Util($fileURL, $outputFolder){
 
 
 
-function GetUSTFiles ($USTFolder) {
-    banner -message "Download UST Files"
+function Get-USTFiles () {
+    Banner -message "Download UST Files"
     if ($pythonVersion -eq 2){
         $URL = $USTPython2URL
     } else {
@@ -253,7 +258,7 @@ function GetUSTFiles ($USTFolder) {
 }
 
 
-function GetOpenSSL ($USTFolder) {
+function Get-OpenSSL () {
 
     #Download OpenSSL 1.0.2l binary for Windows and extract to utils folder
     $openSSLBinFileName = $openSSLBinURL.Split('/')[-1]
@@ -290,7 +295,7 @@ function GetOpenSSL ($USTFolder) {
 
 }
 
-function FinalizeInstallation ($USTFolder, $openSSLUSTFolder) {
+function Finalize-Installation ($openSSLUSTFolder) {
 
     #Download Adobe.IO Cert generation Script and put it into utils\openSSL folder
     $adobeIOCertScript = $adobeIOCertScriptURL.Split('/')[-1]
@@ -339,24 +344,24 @@ python user-sync.pex --process-groups --users mapped
 
 }
 
-function package($USTFolder){
+function Package(){
 
-    banner -message "Packaging"
+    Banner -message "Packaging"
 
     $filename = "UST_v$UST_Version.zip"
 
     try    {
         Write-Host "- Creating $filename with Python $pythonVersion"
-        Start-Process -FilePath $7zpath -ArgumentList "a $filename `"$USTFolder\*`"" -Wait
+        Start-Process -FilePath $7zpath -ArgumentList "a $filename `"$USTFolder\*`"" -Wait -NoNewWindow | Out-Null
     } catch {
-        printColor "Error while packaging..." red
-        printColor ("- " + $PSItem.ToString()) red
+        Print-Color "Error while packaging..." red
+        Print-Color ("- " + $PSItem.ToString()) red
         $warnings.Add("- " + $PSItem.ToString())
     }
 }
 
-function GetPython ($USTFolder) {
-    banner -message "Install Python"
+function Get-Python () {
+    Banner -message "Install Python"
     $install = $FALSE
     $UST_version = 3
     $inst_version = $pythonVersion
@@ -407,7 +412,7 @@ function GetPython ($USTFolder) {
             if (-not (Test-Path "$USTFolder\Utils\$pythonInstaller")){
                 $wc.DownloadFile($pythonURL, "$USTFolder\Utils\$pythonInstaller")
             } else {
-                printColor "- Python already discovered, skipping... " green
+                Print-Color "- Python already discovered, skipping... " green
             }
 
         } else  {
@@ -435,11 +440,11 @@ function GetPython ($USTFolder) {
                 {
                     if ($inst_version -eq 3)
                     {
-                        printColor "- Error: Python may have failed to install Windows updates for this version of Windows.`n- Update Windows manually or try installing Python 2 instead..." red
+                        Print-Color "- Error: Python may have failed to install Windows updates for this version of Windows.`n- Update Windows manually or try installing Python 2 instead..." red
                     }
 
                     $errmsg = "- Python Installation - Error with ExitCode: $( $pythonProcess.ExitCode )"
-                    printColor $errmsg red
+                    Print-Color $errmsg red
                     $warnings.Add($errmsg)
                     $install = $false
                 }
@@ -459,7 +464,7 @@ function GetPython ($USTFolder) {
 
 }
 
-function Cleanup($USTFolder) {
+function Cleanup() {
     try {
       if ($offline){
           #Delete UST Folder after archive is built for offline mode
@@ -476,7 +481,7 @@ function Cleanup($USTFolder) {
 # Main
 if ((New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)){
 
-    $introbanner = "
+    $introBanner = "
                    _   _                 ___
                   | | | |___ ___ _ _    / __|_  _ _ _  __
                   | |_| (_-</ -_) '_|   \__ \ || | ' \/ _|
@@ -484,41 +489,38 @@ if ((New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsI
                                              |__/
     "
 
-    printColor "`n============================================================================" Cyan
-    printColor "v $UST_Version" Cyan
-    printColor $introbanner Cyan
-    banner -message "Adobe User Sync Tool Quick Install" -color Cyan
+    Print-Color "`n============================================================================" Cyan
+    Print-Color "v $UST_Version" Cyan
+    Print-Color $introBanner Cyan
+    Banner -message "Adobe User Sync Tool Quick Install" -color Cyan
     Write-Host ""
 
-    printColor "*** Parameter List ***`n" Green
+    Print-Color "*** Parameter List ***`n" Green
     Write-Host "- Python Version: " $py
     Write-Host "- Clean Py Install: " $cleanpy
     Write-Host "- Offline Package: " $offline
 
     if ($cleanpy -and (-not $offline)) {
         try {
-            pyUninstaller
+            Remove-Python
         } catch {
             $errmsg = "- Failed to completely remove python... "
-            printColor $errmsg red
+            Print-Color $errmsg red
             $warnings.Add($errmsg)
         }
     }
 
-    banner -message "Creating UST Directory"
-    $USTFolder = SetDirectory
-
-    #Create Temp download folder
-    New-Item -Path $DownloadFolder -ItemType "Directory" -Force | Out-Null
+    Banner -message "Creating UST Directory"
+    $USTFolder = Set-Directories
 
     # Install Process
-    banner -message "Download Utilities"
+    Banner -message "Download Utilities"
     try    {
         Write-Host "- Downloading Notepad++..."
         Get-Util $notepadURL "$USTFolder\Utils\Notepad++\" | Out-Null
     } catch {
-        printColor "- Failed to download Notepad++ resources with error:" red
-        printColor ("- " + $PSItem.ToString()) red
+        Print-Color "- Failed to download Notepad++ resources with error:" red
+        Print-Color ("- " + $PSItem.ToString()) red
         $warnings.Add("- " + $PSItem.ToString())
     }
 
@@ -527,7 +529,7 @@ if ((New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsI
         $7zpath = Get-Util $7ZipURL "$USTFolder\Utils\"
         $7zpath = "$7zpath\7-Zip\7z.exe"
     } catch {
-        printColor ("- " + $PSItem.ToString()) red
+        Print-Color ("- " + $PSItem.ToString()) red
         $warnings.Add("- " + $PSItem.ToString())
 
         if (Test-Path "$USTFolder\Utils\7-Zip\7z.exe") {
@@ -539,68 +541,68 @@ if ((New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsI
     }
 
     try    {
-        if ($pythonVersion -ne "none"){ GetPython $USTFolder }
+        if ($pythonVersion -ne "none"){ Get-Python }
     } catch {
-        banner -type Error
-        printColor "- Failed to install Python with error:" red
-        printColor ("- " + $PSItem.ToString()) red
+        Banner -type Error
+        Print-Color "- Failed to install Python with error:" red
+        Print-Color ("- " + $PSItem.ToString()) red
         $warnings.Add("- " + $PSItem.ToString())
     }
 
 
     try    {
-        GetUSTFiles $USTFolder $pythonVersion
+        Get-USTFiles $pythonVersion
     } catch {
-        banner -type Error
-        printColor "- Failed to download UST resources with error:" red
-        printColor ("- " + $PSItem.ToString()) red
+        Banner -type Error
+        Print-Color "- Failed to download UST resources with error:" red
+        Print-Color ("- " + $PSItem.ToString()) red
         $warnings.Add("- " + $PSItem.ToString())
     }
 
     # Try loop as connection occasionally fails the first time
-    banner -message "Download OpenSSL"
+    Banner -message "Download OpenSSL"
     $i = 0
     while ($true)  {
         $i++
         try {
-            $openSSLUSTFolder = GetOpenSSL $USTFolder
+            $openSSLUSTFolder = Get-OpenSSL
             break
         }
         catch {
-            printColor "- Connection failed... retrying... ctrl-c to abort..." Yellow
+            Print-Color "- Connection failed... retrying... ctrl-c to abort..." Yellow
         }
         if ($i -eq 5) {
-            banner -type Warning
+            Banner -type Warning
             $errmsg = "- Open SSL failed to download... retry or download manually..."
-            printColor $errmsg red
+            Print-Color $errmsg red
             $warnings.Add($errmsg)
             break
         }
     }
 
     try  {
-        banner -message "Create Batch Scripts"
-        FinalizeInstallation $USTFolder $openSSLUSTFolder
+        Banner -message "Create Batch Scripts"
+        Finalize-Installation $openSSLUSTFolder
     } catch {
-        banner -type Error
-        printColor "- Failed to create batch files with error:" red
-        printColor ("- " + $PSItem.ToString()) red
+        Banner -type Error
+        Print-Color "- Failed to create batch files with error:" red
+        Print-Color ("- " + $PSItem.ToString()) red
         $warnings.Add("- " + $PSItem.ToString())
     }
 
     if ($offline) {
-        package $USTFolder
+        Package
     }
 
-    Cleanup $USTFolder
+    Cleanup
 
-    banner -message "Install Finish" -color Blue
+    Banner -message "Install Finish" -color Blue
 
     if ($warnings.Count -gt 0){
-        printColor "- Install completed with some warnings: " yellow
+        Print-Color "- Install completed with some warnings: " yellow
 
         foreach($w in $warnings){
-            printColor "$w" red
+            Print-Color "$w" red
         }
 
         Write-Host ""
@@ -608,7 +610,7 @@ if ((New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsI
     }
 
     Write-Host "- Completed - You can begin to edit configuration files in:`n"
-    printColor "- $USTFolder" Green
+    Print-Color "- $USTFolder" Green
     Write-Host ""
 
 }else{
