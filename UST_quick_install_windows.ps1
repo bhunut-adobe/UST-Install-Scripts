@@ -499,8 +499,6 @@ if ((New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsI
     Write-Host "- Clean Py Install: " $cleanpy
     Write-Host "- Offline Package: " $offline
 
-    Write-Host $USTFolder
-
     if ($cleanpy -and (-not $offline)) {
         try {
             Remove-Python
