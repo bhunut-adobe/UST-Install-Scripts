@@ -3,8 +3,7 @@ These scripts will help you install and configure Adobe's User Sync tool.  User 
 and quietly keeps your named user accounts in sync with your local LDAP compliant directory!
 
 Overview:
-https://spark.adobe.com/page/E3hSsLq3G1iVz/
-
+https://spark.adobe.com/page/E3hSsLq3G1iVz/<br/>
 User Sync Tool:
 https://github.com/adobe-apiplatform/user-sync.py
 
