@@ -1,12 +1,16 @@
 param([String]$py="3",
-    [Switch]$cleanpy=$false)
+      [Switch]$cleanpy=$false,
+      [Switch]$offline=$false)
 
 
 if ($py -eq "2"){
     $pythonVersion = "2"
-} else {$pythonVersion = "3"}
+} elseif ($py -eq "none"){
+    $pythonVersion = "none"
+}
+else {$pythonVersion = "3"}
 
-
+$UST_Version = "2.2.2"
 $ErrorActionPreference = "Stop"
 
 # Array for collecting warnings to display at end of install
@@ -336,8 +340,24 @@ python user-sync.pex --process-groups --users mapped
 
 }
 
+function package($USTFolder){
+
+    banner -message "Packaging"
+
+    $filename = "UST_v$UST_Version.zip"
+
+    try    {
+        Write-Host "- Creating $filename with Python $pythonVersion"
+        Start-Process -FilePath $7zpath -ArgumentList "a $filename `"$USTFolder\*`"" -Wait
+    } catch {
+        printColor "Error while packaging..." red
+        printColor ("- " + $PSItem.ToString()) red
+        $warnings.Add("- " + $PSItem.ToString())
+    }
+}
+
 function GetPython ($USTFolder) {
-    banner -message "Install Python $pythonVersion"
+    banner -message "Install Python"
     $install = $FALSE
     $UST_version = 3
     $inst_version = $pythonVersion
@@ -361,12 +381,13 @@ function GetPython ($USTFolder) {
 
     if ($pythonVersion -eq "3" -and -not $p3_installed) { $install = $true }
     elseif ($pythonVersion -eq "2" -and -not $p2_installed) { $install = $true }
+    elseif ($pythonVersion -eq "none"){ $install = $false }
     else {
         Write-Host "- Python version $pythonVersion is already installed..."
     }
 
-    if ($install){
-        Write-Host "- Python $inst_version will be updated/installed..."
+    if ($install -or $offline){
+        Write-Host "- Python $inst_version will be downloaded..."
         if ($inst_version -eq 2){
             $pythonURL = $Python2URL
             $UST_version = 2
@@ -382,52 +403,67 @@ function GetPython ($USTFolder) {
 
 
         $wc = New-Object net.webclient
-        $wc.DownloadFile($pythonURL,$pythonInstallerOutput)
 
-        if(Test-Path $pythonInstallerOutput){
+        if ($offline) {
+            if (-not (Test-Path "$USTFolder\Utils\$pythonInstaller")){
+                $wc.DownloadFile($pythonURL, "$USTFolder\Utils\$pythonInstaller")
+            } else {
+                printColor "- Python already discovered, skipping... " green
+            }
 
-            #Passive Install of Python. This will show progressbar and error.
-            Write-Host "- Begin Python Installation"
-            $pythonProcess = Start-Process $pythonInstallerOutput -ArgumentList @('/passive', 'InstallAllUsers=1', 'PrependPath=1') -Wait -PassThru
-            if($pythonProcess.ExitCode -eq 0){
+        } else  {
 
-                if ($inst_version -eq 2){
-                    Write-Host "- Add C:\Python27 to path..."
-                    [Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Python27\", [EnvironmentVariableTarget]::Machine)
+            $wc.DownloadFile($pythonURL, $pythonInstallerOutput)
+
+            if (Test-Path $pythonInstallerOutput)
+            {
+
+                #Passive Install of Python. This will show progressbar and error.
+                Write-Host "- Begin Python Installation"
+                $pythonProcess = Start-Process $pythonInstallerOutput -ArgumentList @('/passive', 'InstallAllUsers=1', 'PrependPath=1') -Wait -PassThru
+                if ($pythonProcess.ExitCode -eq 0)
+                {
+
+                    if ($inst_version -eq 2)
+                    {
+                        Write-Host "- Add C:\Python27 to path..."
+                        [Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Python27\", [EnvironmentVariableTarget]::Machine)
+                    }
+
+                    Write-Host "- Python Installation - Completed"
                 }
+                else
+                {
+                    if ($inst_version -eq 3)
+                    {
+                        printColor "- Error: Python may have failed to install Windows updates for this version of Windows.`n- Update Windows manually or try installing Python 2 instead..." red
+                    }
 
-                Write-Host "- Python Installation - Completed"
-            }else{
-                if ($inst_version -eq 3){
-                    printColor "- Error: Python may have failed to install Windows updates for this version of Windows.`n- Update Windows manually or try installing Python 2 instead..." red
+                    $errmsg = "- Python Installation - Error with ExitCode: $( $pythonProcess.ExitCode )"
+                    printColor $errmsg red
+                    $warnings.Add($errmsg)
+                    $install = $false
                 }
-
-                $errmsg = "- Python Installation - Error with ExitCode: $($pythonProcess.ExitCode)"
-                printColor $errmsg red
-                $warnings.Add($errmsg)
-                $install = $false
             }
         }
     }
 
-    #Set Environment Variable
-    Write-Host "- Set PEX_ROOT System Environment Variable"
-    [Environment]::SetEnvironmentVariable("PEX_ROOT", "$env:SystemDrive\PEX", "Machine")
+    if (-not $offline) {
+
+        #Set Environment Variable
+        Write-Host "- Set PEX_ROOT System Environment Variable"
+        [Environment]::SetEnvironmentVariable("PEX_ROOT", "$env:SystemDrive\PEX", "Machine")
+
+    }
 
 
 
 }
 
 function Cleanup() {
-
     try{
         #Delete Temp DownloadFolder for UST, Python and Config files
         Remove-Item -Path $DownloadFolder -Recurse -Confirm:$false -Force
-    } catch {}
-
-    try {
-        #Delete 7-zip temp folder
-        Remove-Item -Path "C:\7-zip" -Recurse -Confirm:$false -Force
     } catch {}
 }
 
@@ -443,7 +479,7 @@ if ((New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsI
     "
 
     printColor "`n============================================================================" Cyan
-    printColor "v 2.2.2" Cyan
+    printColor "v $UST_Version" Cyan
     printColor $introbanner Cyan
     banner -message "Adobe User Sync Tool Quick Install" -color Cyan
     Write-Host ""
@@ -451,8 +487,9 @@ if ((New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsI
     printColor "*** Parameter List ***`n" Green
     Write-Host "- Python Version: " $py
     Write-Host "- Clean Py Install: " $cleanpy
+    Write-Host "- Offline Package: " $offline
 
-    if ($cleanpy) {
+    if ($cleanpy -and (-not $offline)) {
         try {
             pyUninstaller
         } catch {
@@ -496,7 +533,7 @@ if ((New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsI
     }
 
     try    {
-        GetPython $USTFolder
+        if ($pythonVersion -ne "none"){ GetPython $USTFolder }
     } catch {
         banner -type Error
         printColor "- Failed to install Python with error:" red
@@ -543,6 +580,10 @@ if ((New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsI
         printColor "- Failed to create batch files with error:" red
         printColor ("- " + $PSItem.ToString()) red
         $warnings.Add("- " + $PSItem.ToString())
+    }
+
+    if ($offline) {
+        package $USTFolder
     }
 
     Cleanup
