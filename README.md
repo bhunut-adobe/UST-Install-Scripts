@@ -17,11 +17,13 @@ You should set the execution policy for powershell to allow your VM to run scrip
 <code>(New-Object System.Net.WebClient).DownloadFile("https://git.io/vx8fh","${PWD}\inst.ps1"); .\inst.ps1; rm -Force .\inst.ps1;</code>
 
 ### Incudes:
+<ul>
 <li>Python 2.7 or 3.64</li>
 <li>UST Application and configuration files</li>
 <li>Open SSL for certificate/key generation</li>
 <li>7-Zip portable version for extracting .tar.gz archives</li>
 <li>Notepad++ portable version for better YAML editing </li>
+</ul>
 
 ### Batch Files:
 <b>Run_UST_Live.bat:</b> Runs UST in live mode with options -users mapped --process-groups<br/>
