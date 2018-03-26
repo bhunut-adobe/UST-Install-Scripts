@@ -2,7 +2,6 @@ param([String]$py="3",
       [Switch]$cleanpy=$false,
       [Switch]$offline=$false)
 
-
 if ($py -eq "2"){
     $pythonVersion = "2"
 } elseif ($py -eq "none"){
