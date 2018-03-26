@@ -12,7 +12,7 @@ $expirationDay = ($expirationDate - (Get-Date)).Days
 
 $USTFolder = "..\..\"
 $OpenSSL = "openssl.exe"
-$OpenSSLConfig = "openssl.cnf"
+$OpenSSLConfig = ".\openssl.cnf"
 
 if(Test-Path $OpenSSL){
     $argslist = @("/c $OpenSSL",

@@ -310,7 +310,7 @@ function Finalize-Installation ($openSSLUSTFolder) {
 
     if(Test-Path $adobeIOCertScriptOutputPath){
 
-        $batchfile = '@"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -InputFormat None -ExecutionPolicy Bypass -file ' + $adobeIOCertScriptOutputPath
+        $batchfile = '@"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -InputFormat None -ExecutionPolicy Bypass -file ' + $adobeIOCertScript
         $batchfile | Out-File "$openSSLUSTFolder\Adobe_IO_Cert_Generation.bat" -Force -Encoding ascii
 
     }
@@ -321,7 +321,7 @@ function Finalize-Installation ($openSSLUSTFolder) {
     if(Test-Path $USTFolder){
         Write-Host "- Creating Open_Config_Files.bat... "
         $openCFG_batchfile = @"
-start "" .\Utils\Notepad++\notepad++.exe *.yml
+start "" .\Utils\Notepad++\notepad++.exe *.yml *.crt
 exit
 "@
         $openCFG_batchfile | Out-File "$USTFolder\Open_Config_Files.bat" -Force -Encoding ascii
@@ -329,7 +329,6 @@ exit
         Write-Host "- Creating Run_UST_Test_Mode.bat... "
         $test_mode_batchfile = @"
 REM "Running UST in TEST-MODE"
-cd "$USTFolder"
 python user-sync.pex --process-groups --users mapped -t
 pause
 "@
@@ -338,7 +337,6 @@ pause
         Write-Host "- Creating Run_UST_Live.bat... "
         $live_mode_batchfile = @"
 REM "Running UST"
-cd "$USTFolder"
 python user-sync.pex --process-groups --users mapped
 "@
         $live_mode_batchfile | Out-File "$USTFolder\Run_UST_Live.bat" -Force -Encoding ascii
