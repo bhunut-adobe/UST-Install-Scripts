@@ -34,7 +34,7 @@ $Python3URL = "https://www.python.org/ftp/python/3.6.4/python-3.6.4-amd64.exe"
 $DownloadFolder = "$env:TEMP\USTDownload"
 
 # UST folder location
-$USTInstallDir = "${PWD}".TrimEnd('\')+"\UST_Install"
+$USTInstallDir = (Get-Item -Path ".\" -Verbose).FullName.TrimEnd('\')+"\UST_Install"
 
 
 function Print-Color ($msg, $color) {
