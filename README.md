@@ -9,9 +9,11 @@ https://github.com/adobe-apiplatform/user-sync.py
 
 
 ## Windows Powershell:
-You should set the execution policy for powershell to allow your VM to run scripts temporarily
+You should set the execution policy for powershell to allow your VM to run scripts temporarily:
 
 <code>Set-ExecutionPolicy Bypass -Scope Process;</code> 
+
+Run the install script:
 
 <code>(New-Object System.Net.WebClient).DownloadFile("https://git.io/vx8fh","${PWD}\inst.ps1"); .\inst.ps1; rm -Force .\inst.ps1;</code>
 
