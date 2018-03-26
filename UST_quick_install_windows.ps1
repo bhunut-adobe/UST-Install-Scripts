@@ -459,7 +459,14 @@ function GetPython ($USTFolder) {
 
 }
 
-function Cleanup() {
+function Cleanup($USTFolder) {
+    try {
+      if ($offline){
+          #Delete UST Folder after archive is built for offline mode
+          Remove-Item -Path $USTFolder -Recurse -Confirm:$false -Force
+      }
+
+    } catch {}
     try{
         #Delete Temp DownloadFolder for UST, Python and Config files
         Remove-Item -Path $DownloadFolder -Recurse -Confirm:$false -Force
@@ -585,7 +592,7 @@ if ((New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsI
         package $USTFolder
     }
 
-    Cleanup
+    Cleanup $USTFolder
 
     banner -message "Install Finish" -color Blue
 
