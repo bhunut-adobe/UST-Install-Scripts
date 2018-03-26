@@ -97,7 +97,7 @@ function Expand-TarGZ() {
 
     try    {
         Start-Process -FilePath $7zpath -ArgumentList "x `"$Path`" -aoa -y -o`"$DownloadFolder`"" -Wait
-        Start-Process -FilePath $7zpath -ArgumentList "x `"$DownloadFolder\$filename`" -aoa -ttar -y -o`"$Output`""
+        Start-Process -FilePath $7zpath -ArgumentList "x `"$DownloadFolder\$filename`" -aoa -ttar -y -o`"$Output`"" -Wait
     } catch {
 
        Print-Color "Error while extracting $path..." red
@@ -246,6 +246,7 @@ function Get-USTFiles () {
 
     #Make example config files readable in windows and Copy "config files - basic" to root
     $configExamplePath = "$USTFolder\examples"
+
     if(Test-Path -Path $configExamplePath){
         Get-ChildItem -Path $configExamplePath -Recurse -Filter '*.yml' | % { ( $_ |  Get-Content ) | Set-Content $_.pspath -Force }
         #Copy config files
@@ -253,6 +254,7 @@ function Get-USTFiles () {
         Copy-Item -Path "$configBasicPath\3 connector-ldap.yml" -Destination $USTFolder\connector-ldap.yml -Force
         Copy-Item -Path "$configBasicPath\2 connector-umapi.yml" -Destination $USTFolder\connector-umapi.yml -Force
         Copy-Item -Path "$configBasicPath\1 user-sync-config.yml" -Destination $USTFolder\user-sync-config.yml -Force
+
 
     }
 }
