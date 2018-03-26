@@ -19,17 +19,22 @@ You should set the execution policy for powershell to allow your VM to run scrip
 
 ##### Arguments
 
-<code>-py <2 | 3></code>
+<code>-py <2 | 3 | none></code>
 
 You can choose which Python version to use by changing the -py flag
-on the call. Values of 2 and 3 are allowed.  Note that Adobe recommends using at least Python 3.6.3 for future
-support.
+on the call. Values of 2 and 3 are allowed.  You can also choose none, if you wish to skip Python.
 
 <code>-cleanpy</code>
 
 This feature is useful! When used, the script will remove <b>all existing Python installations for all versions</b>, which
 leaves the VM clean so that the correct versions can be used.  User Sync <b>requires</b> that the installed Python version be
 64 bit! This flag helps to smooth and clean up the install process.
+
+<code>-offline</code>
+
+This option builds a complete UST package, and includes the appropriate Python installer as part of the archive.  You can use this
+to generate install packages for VM's that are not able to run the script.  You can also use "-py none" to create a package
+with no installer.
 
 Example calls with flags:
 
