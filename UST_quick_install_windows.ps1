@@ -1,6 +1,6 @@
 param([String]$py="3",
-    [Switch]$cleanpy=$false,
-    [Switch]$offline=$false)
+      [Switch]$cleanpy=$false,
+      [Switch]$offline=$false)
 
 if ($py -eq "2"){
     $pythonVersion = "2"
@@ -34,7 +34,7 @@ $Python3URL = "https://www.python.org/ftp/python/3.6.4/python-3.6.4-amd64.exe"
 $DownloadFolder = "$env:TEMP\USTDownload"
 
 # UST folder location
-$USTInstallDir = (Get-Item -Path ".\" -Verbose).FullName.TrimEnd('\')+"\UST_Install"
+$USTInstallDir = "$PWD\UST_Install"
 
 
 function Print-Color ($msg, $color) {
@@ -99,9 +99,9 @@ function Expand-TarGZ() {
         Start-Process -FilePath $7zpath -ArgumentList "x `"$Path`" -aoa -y -o`"$DownloadFolder`"" -Wait
         Start-Process -FilePath $7zpath -ArgumentList "x `"$DownloadFolder\$filename`" -aoa -ttar -y -o`"$Output`"" -Wait
     } catch {
-        Print-Color "Error while extracting $path..." red
-        Print-Color ("- " + $PSItem.ToString()) red
-        $warnings.Add("- " + $PSItem.ToString())
+       Print-Color "Error while extracting $path..." red
+       Print-Color ("- " + $PSItem.ToString()) red
+       $warnings.Add("- " + $PSItem.ToString())
     }
 }
 
@@ -292,7 +292,7 @@ function Get-OpenSSL () {
     $wc = New-Object net.webclient
     $wc.DownloadFile($openSSLConfigURL,$openSSLConfigOutputPath)
 
-    return $openSSLUSTFolder
+    return ([String]$openSSLUSTFolder).trim()
 
 }
 
@@ -465,10 +465,10 @@ function Get-Python () {
 
 function Cleanup() {
     try {
-        if ($offline){
-            #Delete UST Folder after archive is built for offline mode
-            Remove-Item -Path $USTFolder -Recurse -Confirm:$false -Force
-        }
+      if ($offline){
+          #Delete UST Folder after archive is built for offline mode
+          Remove-Item -Path $USTFolder -Recurse -Confirm:$false -Force
+      }
 
     } catch {}
     try{
