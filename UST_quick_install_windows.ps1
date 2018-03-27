@@ -292,7 +292,7 @@ function Get-OpenSSL () {
     $wc = New-Object net.webclient
     $wc.DownloadFile($openSSLConfigURL,$openSSLConfigOutputPath)
 
-    return ([String]$openSSLUSTFolder).trim()
+    return $openSSLUSTFolder
 
 }
 
@@ -565,6 +565,7 @@ if ((New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsI
         $i++
         try {
             $openSSLUSTFolder = Get-OpenSSL
+            $openSSLUSTFolder = ([String]$openSSLUSTFolder).trim()
             break
         }
         catch {
