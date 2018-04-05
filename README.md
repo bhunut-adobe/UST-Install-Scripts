@@ -90,4 +90,8 @@ This option builds a complete UST package in .tar.gz format on your local machin
 to deploy the tool to VM's that are not able to run the script. Use this in combination with the above commands
 to produce a target UST/python version package for your host.
 
+Example calls with flags:
 
+<code>sudo sh -c 'wget -O ins.sh https://git.io/vx8JV; chmod 777 ins.sh; ./ins.sh --install-python; rm ins.sh;'</code>
+
+<code>sudo sh -c 'wget -O ins.sh https://git.io/vx8JV; chmod 777 ins.sh; ./ins.sh --install-python --ust-version 2.3; rm ins.sh;'</code>
