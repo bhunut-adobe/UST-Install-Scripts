@@ -337,8 +337,8 @@ function getUSTFiles(){
     rm $USTArch $EXArch
 
     printColorOS "Creating shell scripts for running UST..."
-    printf "#!/usr/bin/env bash\n./user-sync --users all --process-groups -t" > "$USTFolder/run-user-sync-test.sh"
-    printf "#!/usr/bin/env bash\n./user-sync --users all --process-groups" > "$USTFolder/run-user-sync.sh"
+    printf "#!/usr/bin/env bash\n./user-sync --users mapped --process-groups -t" > "$USTFolder/run-user-sync-test.sh"
+    printf "#!/usr/bin/env bash\n./user-sync --users mapped --process-groups" > "$USTFolder/run-user-sync.sh"
 
     printColorOS "Generating shell script for certificate generation..."
     SSLString="openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout private.key -out certificate_pub.crt"
