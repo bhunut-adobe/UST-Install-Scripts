@@ -19,7 +19,7 @@ Run the install script:
 
 ### Incudes:
 <ul>
-<li>Python 2.7 or 3.64</li>
+<li>python 2.7 or 3.64</li>
 <li>UST Application and configuration files</li>
 <li>Open SSL for certificate/key generation</li>
 <li>7-Zip portable version for extracting .tar.gz archives</li>
@@ -37,18 +37,18 @@ install directory.<br/>
 
 <code>-py <2 | 3 | none></code>
 
-You can choose which Python version to use by changing the -py flag
-on the call. Values of 2 and 3 are allowed.  You can also choose none, if you wish to skip Python.
+You can choose which python version to use by changing the -py flag
+on the call. Values of 2 and 3 are allowed.  You can also choose none, if you wish to skip python.
 
 <code>-cleanpy</code>
 
-This feature is useful! When used, the script will remove <b>all existing Python installations for all versions</b>, which
-leaves the VM clean so that the correct versions can be used.  User Sync <b>requires</b> that the installed Python version be
+This feature is useful! When used, the script will remove <b>all existing python installations for all versions</b>, which
+leaves the VM clean so that the correct versions can be used.  User Sync <b>requires</b> that the installed python version be
 64 bit! This flag helps to smooth and clean up the install process.
 
 <code>-offline</code>
 
-This option builds a complete UST package, and includes the appropriate Python installer as part of the archive.  You can use this
+This option builds a complete UST package, and includes the appropriate python installer as part of the archive.  You can use this
 to generate install packages for VM's that are not able to run the script.  You can also use "-py none" to create a package
 with no installer.
 
@@ -59,15 +59,35 @@ Example calls with flags:
 <code>(New-Object System.Net.WebClient).DownloadFile("https://git.io/vx8fh","inst.ps1"); .\inst.ps1 <b>-cleanpy</b>; rm -Force .\inst.ps1;</code>
 
 ### Ubuntu 12.04 + 
-<b>This script is still under development, additional setup may be required!!</b>
+<b>This script is still under development - additional setup may be required!!</b>
+
+The following will install User Sync and related packages (includes python if desired)
+
+<code>sudo sh -c 'wget -O ins.sh https://git.io/vx8JV; chmod 777 ins.sh; ./ins.sh; rm ins.sh;'</code>
 
 For older versions (12.04), you may need to run this line first to enable the proper security protocols
 
-
-
-
 <code>sudo sh -c 'apt-get update; apt-get install wget openssl libssl-dev -y -qq;' &> /dev/null</code>
 
-The following will install User Sync and related packages (includes Python)
+### Arguments
 
-<code>sudo sh -c 'wget -O ins.sh https://git.io/vx8JV; chmod 777 ins.sh; ./ins.sh; rm ins.sh;'</code>
+<code>--ust-Version <2.2.2 | 2.3></code>
+
+Specify which version of UST you want to install.  The recommended version at this time is 2.2.2, since 2.3 is currently 2.3rc4. By default, 2.2.2 will be installed.
+The version of UST to be used along with your host Ubuntu version determine which python version shoudl be used, and fetches the appropriate user-sync package.
+
+<code>--install-python</code>
+
+By default, python is neither installed nor updated.  The script will determine which version of the user-sync tool to fetch based on which python versions are native to your
+host Ubuntu version.  If you add the <b/>--install-python</b> flag, the script will determine the highest possible python version that can be installed on your host to work with
+the selected UST version, and install/update that python version before downloading the tool.  This command can also be used in conjunction with the --offline flag to build
+deployment archives for a target host and optimal python version.  The general behavior is: find which version of python 3 the UST version requires.  If that version is available, install it.
+Otherwise, revert to python 2.7.
+
+<code>--offline</code>
+
+This option builds a complete UST package in .tar.gz format on your local machine. You can use this
+to deploy the tool to VM's that are not able to run the script. Use this in combination with the above commands
+to produce a target UST/python version package for your host.
+
+
