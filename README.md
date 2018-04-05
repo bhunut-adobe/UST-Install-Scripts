@@ -15,7 +15,7 @@ You should set the execution policy for powershell to allow your VM to run scrip
 
 Run the install script:
 
-<code>(New-Object System.Net.WebClient).DownloadFile("https://git.io/vx8fh","${PWD}\inst.ps1"); .\inst.ps1; rm -Force .\inst.ps1;</code>
+<code>(New-Object System.Net.WebClient).DownloadFile("https://git.io/vx8fh","inst.ps1"); .\inst.ps1; rm -Force .\inst.ps1;</code>
 
 ### Incudes:
 <ul>
@@ -54,17 +54,20 @@ with no installer.
 
 Example calls with flags:
 
-<code>(New-Object System.Net.WebClient).DownloadFile("https://git.io/vx8fh","${PWD}\inst.ps1"); .\inst.ps1 <b>-py 2</b>; rm -Force .\inst.ps1;</code>
+<code>(New-Object System.Net.WebClient).DownloadFile("https://git.io/vx8fh","inst.ps1"); .\inst.ps1 <b>-py 2</b>; rm -Force .\inst.ps1;</code>
 
-<code>(New-Object System.Net.WebClient).DownloadFile("https://git.io/vx8fh","${PWD}\inst.ps1"); .\inst.ps1 <b>-cleanpy</b>; rm -Force .\inst.ps1;</code>
+<code>(New-Object System.Net.WebClient).DownloadFile("https://git.io/vx8fh","inst.ps1"); .\inst.ps1 <b>-cleanpy</b>; rm -Force .\inst.ps1;</code>
 
 ### Ubuntu 12.04 + 
 <b>This script is still under development, additional setup may be required!!</b>
 
 For older versions (12.04), you may need to run this line first to enable the proper security protocols
 
-<code>sudo sh -c 'apt-get update; apt-get install curl openssl libssl-dev -y;'</code>
+
+
+
+<code>sudo sh -c 'apt-get update; apt-get install wget openssl libssl-dev -y -qq;' &> /dev/null</code>
 
 The following will install User Sync and related packages (includes Python)
 
-<code>sudo sh -c 'curl -s -L https://git.io/vx8JV > ins.sh; chmod 777 ins.sh; ./ins.sh; rm ins.sh;'</code>
+<code>sudo sh -c 'wget -O ins.sh https://git.io/vx8JV; chmod 777 ins.sh; ./ins.sh; rm ins.sh;'</code>
