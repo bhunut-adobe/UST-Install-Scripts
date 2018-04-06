@@ -8,6 +8,7 @@
 offlineMode=false
 installPython=false
 installWarnings=false
+offlinePyUpdate=false
 ustVer="2.2.2"
 
 while [[ $# -gt 0 ]]
@@ -325,7 +326,7 @@ function getUSTFiles(){
     validateDownload $EXArch
 
     printColorOS "Creating directory $USTFolder/examples..."
-    mkdir $USTFolder/examples &> /dev/null
+    mkdir "$USTFolder/examples" &> /dev/null
 
     extractArchive $USTArch "$USTFolder"
 
@@ -411,10 +412,11 @@ function verifyHostVersion(){
         hostVersion=$(echo $numericalVersion | cut -c1-2)
     fi
 
-    if (( $hostVersion%2 != 0 )); then
+    if [[ $hostVersion%2 != 0 ]]; then
         printColorOS "Only LTS versions are officially supported.  Extra configuration may be required... \n" yellow
     fi
-    if (( $hostVersion == 13 )); then
+
+    if [[ $hostVersion == 13 && $offlineMode == false ]]; then
         printColorOS "You must download tar.gz files manually on Ubuntu 13... (tls 1.2 not supported) " red
         printColorOS "Place them in the current directory and re-run for automated extraction...\n" red
     fi
@@ -437,7 +439,6 @@ function choosePythonVersion(){
     [[ $ustVer == "2.3" ]] && py3V="3.6" || py3V="3.5"
 
     $(isPyVersionInstalled $py3V) && pyversion=3 || pyversion=2
-
 
     # Default python versions for Ubuntu
     if $offlineMode && ! $installPython; then
