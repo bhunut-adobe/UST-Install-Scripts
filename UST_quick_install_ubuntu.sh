@@ -124,7 +124,7 @@ function banner(){
 
     sep="$(printf -- '=%.0s' {1..20})"
 
-    if [ $color=="green" ]; then
+    if [[ $color == "green" ]]; then
         case $type in
             "Warning") color="yellow";;
             "Error") color="red";;
@@ -354,7 +354,7 @@ function getUSTFiles(){
 
 function configureInstallDirectory(){
     local USTInstallDir="${PWD}/UST_Install"
-    if [ -d "${USTInstallDir}" ]; then
+    if [[ -d "${USTInstallDir}" ]]; then
         rm -rf "${USTInstallDir}"
     fi
     mkdir "${USTInstallDir}"
@@ -389,7 +389,7 @@ function verifyHostVersion(){
         echo " 7. 18.04"
         echo ""
 
-        while [ 1 -eq 1 ]; do
+        while [[ 1 -eq 1 ]]; do
             read -p "> " choice
             case $choice in
                 1) numericalVersion="12.04"; break;;
@@ -412,7 +412,7 @@ function verifyHostVersion(){
         hostVersion=$(echo $numericalVersion | cut -c1-2)
     fi
 
-    if [[ $hostVersion%2 != 0 ]]; then
+    if (( $hostVersion%2 != 0 )); then
         printColorOS "Only LTS versions are officially supported.  Extra configuration may be required... \n" yellow
     fi
 
@@ -423,7 +423,7 @@ function verifyHostVersion(){
 
     printf -- "- Ubuntu version: "
 
-    if [ $hostVersion -lt 12 ]; then
+    if [[ $hostVersion -lt 12 ]]; then
         printColor $numericalVersion red
         echo "- Your host version is not supported... "
         exit
@@ -498,7 +498,7 @@ function main(){
 
     printUSTBanner
 
-    if [ "$EUID" -ne 0 ]; then
+    if [[ "$EUID" -ne 0 ]]; then
         printColorOS "Please re-run with sudo... \n" yellow
         exit
     fi
