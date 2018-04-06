@@ -38,7 +38,10 @@ case $key in
 esac
 done
 
-if $offlineMode ; then installPython=false ; fi
+if $offlineMode ; then
+    offlinePyUpdate=$installPython;
+    installPython=false ;
+fi
 
 if [[ $ustVer == "2.3" ]]; then
     # UST Version 2.3rc4 Links
@@ -370,7 +373,39 @@ function isPyVersionInstalled(){
 
 function verifyHostVersion(){
 
-    if ! $offlineMode; then
+    if $offlineMode; then
+
+        printColor " --- OFFLINE MODE --- "  blue
+        echo ""
+        echo " Please choose your target Ubunutu Version: "
+        echo ""
+        echo " 1. 12.04"
+        echo " 2. 13.04"
+        echo " 3. 14.04"
+        echo " 4. 15.04"
+        echo " 5. 16.04"
+        echo " 6. 17.04"
+        echo " 7. 18.04"
+        echo ""
+
+        while [ 1 -eq 1 ]; do
+            read -p "> " choice
+            case $choice in
+                1) numericalVersion="12.04"; break;;
+                2) numericalVersion="13.04"; break;;
+                3) numericalVersion="14.04"; break;;
+                4) numericalVersion="15.04"; break;;
+                5) numericalVersion="16.04"; break;;
+                6) numericalVersion="17.04"; break;;
+                7) numericalVersion="18.04"; break;;
+                *) ;;
+            esac
+        done
+        echo ""
+
+        hostVersion=$(echo $numericalVersion | cut -c1-2)
+
+    else
         longVersionName=($(lsb_release -r))
         numericalVersion=${longVersionName[1]}
         hostVersion=$(echo $numericalVersion | cut -c1-2)
@@ -403,39 +438,6 @@ function choosePythonVersion(){
 
     $(isPyVersionInstalled $py3V) && pyversion=3 || pyversion=2
 
-    if $offlineMode; then
-
-        printColor " --- OFFLINE MODE --- "  blue
-        echo ""
-        echo " Please choose your User-Sync Version: "
-        echo ""
-        echo " 1. 12.04"
-        echo " 2. 13.04"
-        echo " 3. 14.04"
-        echo " 4. 15.04"
-        echo " 5. 16.04"
-        echo " 6. 17.04"
-        echo " 7. 18.04"
-        echo ""
-
-        while [ 1 -eq 1 ]; do
-            read -p "> " choice
-            case $choice in
-                1) numericalVersion="12.04"; break;;
-                2) numericalVersion="13.04"; break;;
-                3) numericalVersion="14.04"; break;;
-                4) numericalVersion="15.04"; break;;
-                5) numericalVersion="16.04"; break;;
-                6) numericalVersion="17.04"; break;;
-                7) numericalVersion="18.04"; break;;
-                *) ;;
-            esac
-        done
-        echo ""
-
-        hostVersion=$(echo $numericalVersion | cut -c1-2)
-
-    fi
 
     # Default python versions for Ubuntu
     if $offlineMode && ! $installPython; then
@@ -455,7 +457,8 @@ function choosePythonVersion(){
         fi
     fi
 
-    if $installPython; then
+
+    if $installPython || $offlinePyUpdate; then
         if [[ $ustVer == "2.3" ]]; then
             # Must support python 3.6
             case $hostVersion in
