@@ -499,8 +499,9 @@ function main(){
         exit
     fi
 
-    choosePythonVersion
     verifyHostVersion
+    choosePythonVersion
+
 
     printf -- "- User-Sync version: "; printColor $ustVer green
     printf -- "- Offline Mode: "; printColor $offlineMode green
