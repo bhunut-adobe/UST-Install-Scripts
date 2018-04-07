@@ -153,7 +153,7 @@ function download(){
 
 function installPython27(){
 
-   if [[ $hostVersion -eq 17 ]]; then printColorOS "Warning: python 2.7 may fail to install on Ubuntu 18..." yellow; fi
+   if [[ $hostVersion == "17" ]]; then switchMissingRepos; fi
 
    printColorOS "Installing Python 2.7..."
    apt-get -qq install -y --force-yes python2.7&> /dev/null
@@ -171,6 +171,10 @@ function installPython35(){
     add-apt-repository -remove ppa:fkrull/deadsnakes -y  &> /dev/null
 }
 
+function switchMissingRepos(){
+    sudo sed -i -e 's/archive.ubuntu.com\|security.ubuntu.com/old-releases.ubuntu.com/g' /etc/apt/sources.list
+    apt-get -qq update  &> /dev/null
+}
 
 function installPython36(){
 
@@ -204,8 +208,8 @@ function installpy(){
     else
 
         apt-get -qq install -y --force-yes software-properties-common &> /dev/null
-        apt-get -qq install -y --force-yes python-software-properties&> /dev/null
-        apt-get -qq install -y --force-yes python3-software-properties&> /dev/null
+        apt-get -qq install -y --force-yes python-software-properties &> /dev/null
+        apt-get -qq install -y --force-yes python3-software-properties &> /dev/null
 
         case $ustVer in
            "2.3") installPython36
@@ -285,6 +289,8 @@ function extractArchive(){
     fi
 
 }
+
+
 
 function package(){
 
@@ -390,7 +396,7 @@ function verifyHostVersion(){
         echo ""
 
         while [[ 1 -eq 1 ]]; do
-            read -p "> " choice
+            read -p "$ " choice
             case $choice in
                 1) numericalVersion="12.04"; break;;
                 2) numericalVersion="13.04"; break;;
@@ -413,10 +419,23 @@ function verifyHostVersion(){
     fi
 
     if (( $hostVersion%2 != 0 )); then
-        printColorOS "Only LTS versions are officially supported.  Extra configuration may be required... \n" yellow
+        printColorOS "Only LTS versions are officially supported.  Extra configuration may be required... " yellow
     fi
 
-    if [[ $hostVersion == 13 && $offlineMode == false ]]; then
+    if [[ $hostVersion == 17 && $ustVer == "2.3" && ! $offlineMode ]]; then
+        printColorOS "Warning: User Sync 2.3rc4 cannot run on Ubuntu 17 unless python 2.7 is installed. Would you like to install python 2.7?" magenta
+        while [[ 1 -eq 1 ]]; do
+            read -p "- (y/n)$ " choice
+            case $choice in
+                "y") installPython=true; break;;
+                "n") break;;
+                *) ;;
+            esac
+        done
+    fi
+
+    echo ""
+    if [[ $hostVersion == 13 && $offlineMode ]]; then
         printColorOS "You must download tar.gz files manually on Ubuntu 13... (tls 1.2 not supported) " red
         printColorOS "Place them in the current directory and re-run for automated extraction...\n" red
     fi
