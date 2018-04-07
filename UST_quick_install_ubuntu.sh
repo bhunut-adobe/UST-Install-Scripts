@@ -84,13 +84,20 @@ function printColorOS(){
 function printUSTBanner(){
  cat << EOM
 $(tput setaf 6)
-  _   _                 ___
- | | | |___ ___ _ _    / __|_  _ _ _  __
- | |_| (_-</ -_) '_|   \__ \ || | ' \/ _|
-  \___//__/\___|_|     |___/\_, |_||_\__|
-                            |__/
-$(tput sgr 0)
+=========================================================
+
+         _   _                 ___
+        | | | |___ ___ _ _    / __|_  _ _ _  __
+        | |_| (_-</ -_) '_|   \__ \ || | ' \/ _|
+         \___//__/\___|_|     |___/\_, |_||_\__|
+                                   |__/
+
+
+$(tput setaf 2)Ubuntu Quick Install 2.0 for UST v2.2.2 - 2.3rc4
+https://github.com/janssenda-adobe/UST-Install-Scripts    $(tput setaf 6)
+=========================================================$(tput sgr 0)
 EOM
+
 }
 
 function banner(){
@@ -280,7 +287,7 @@ function extractArchive(){
     sourceDir=$1
     destination=$2
 
-    printColorOS "Extracting $sourceDir to $destination..."
+    printColorOS "Extracting $sourceDir to  $(tput setaf 3)$destination$(tput sgr 0)..."
 
     if ! tar -zxvf $sourceDir -C "$destination" &> /dev/null; then
         printColorOS "Extraction error!" red
@@ -303,7 +310,7 @@ function package(){
     tar -czf $filename -C "$USTFolder" .
     rm -rf "$USTFolder"
 
-    printColorOS "Package complete! You can now distribute $filename to your remote server!\n" green
+    printColorOS "Package complete! You can now distribute $(tput setaf 5)$filename$(tput setaf 2) to your remote server!\n" green
 
 }
 
@@ -321,8 +328,7 @@ function getUSTFiles(){
 
     banner -m "Configuring UST"
 
-    printColorOS "Using directory $USTFolder..."
-
+    printColorOS "Using directory $(tput setaf 3)$USTFolder$(tput sgr 0)..."
     printColorOS "Downloading UST $USTVersion..."
     USTArch=$(download $USTUrl)
     validateDownload $USTArch
@@ -331,7 +337,7 @@ function getUSTFiles(){
     EXArch=$(download $USTExamplesURL)
     validateDownload $EXArch
 
-    printColorOS "Creating directory $USTFolder/examples..."
+    printColorOS "Creating directory $(tput setaf 3)$USTFolder/examples$(tput sgr 0)..."
     mkdir "$USTFolder/examples" &> /dev/null
 
     extractArchive $USTArch "$USTFolder"
@@ -359,7 +365,10 @@ function getUSTFiles(){
 }
 
 function configureInstallDirectory(){
-    local USTInstallDir="${PWD}/UST_Install"
+
+    #local USTInstallDir="${PWD}/UST_Install"
+    USTInstallDir="${PWD}/User-Sync-${ustVer}"
+
     if [[ -d "${USTInstallDir}" ]]; then
         rm -rf "${USTInstallDir}"
     fi
@@ -382,7 +391,7 @@ function verifyHostVersion(){
 
     if $offlineMode; then
 
-        printColor " --- OFFLINE MODE --- "  blue
+        printColor " --- OFFLINE MODE --- "  magenta
         echo ""
         echo " Please choose your target Ubunutu Version: "
         echo ""
@@ -408,7 +417,6 @@ function verifyHostVersion(){
                 *) ;;
             esac
         done
-        echo ""
 
         hostVersion=$(echo $numericalVersion | cut -c1-2)
 
@@ -419,16 +427,25 @@ function verifyHostVersion(){
     fi
 
     if (( $hostVersion%2 != 0 )); then
+        echo ""
         printColorOS "Only LTS versions are officially supported.  Extra configuration may be required... " yellow
     fi
 
-    if [[ $hostVersion == 17 && $ustVer == "2.3" && ! $offlineMode ]]; then
-        printColorOS "Warning: User Sync 2.3rc4 cannot run on Ubuntu 17 unless python 2.7 is installed. Would you like to install python 2.7?" magenta
+    py27Needed=false
+    case $hostVersion in
+        17) if [[ ustVer == "2.3" ]]; then py27Needed=true; fi ;;
+        18) if [[ ustVer == "2.2.2" ]]; then py27Needed=true; fi ;;
+         *) ;;
+    esac
+
+    if $py27Needed; then
+        printColorOS "Warning: The selected version of UST cannot run your version of Ubuntu unless python 2.7 is installed. " magenta
+        printColorOS "Would you like to install python 2.7?\n" magenta
         while [[ 1 -eq 1 ]]; do
             read -p "- (y/n)$ " choice
             case $choice in
-                "y") installPython=true; break;;
-                "n") break;;
+                "y") installPython=true; ;;
+                "n") ;;
                 *) ;;
             esac
         done
@@ -534,7 +551,7 @@ function main(){
 
     sudo chmod 777 -R "$USTFolder"
 
-    banner -m "Install Finish" -c blue
+    banner -m "Install Finish" -c cyan
     echo ""
 
     if $installWarnings; then
