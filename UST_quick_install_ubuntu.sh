@@ -562,7 +562,7 @@ function main(){
         package
     else
         printColorOS "Completed - You can begin to edit configuration files in:"
-        printColorOS "$USTFolder" green
+        printColor "  $USTFolder" green
         echo ""
         printColorOS "Folder permissions set to 777 for configuration file editing..." yellow
         printColorOS "When you are finished, please run chmod 555 -R on the folder to reset permissions!" yellow

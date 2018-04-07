@@ -584,6 +584,7 @@ https://github.com/janssenda-adobe/UST-Install-Scripts"
         $i++
         try {
             $openSSLUSTFolder = Get-OpenSSL
+            $openSSLUSTFolder = ([String]$openSSLUSTFolder).Trim()
             break
         }
         catch {
@@ -628,7 +629,7 @@ https://github.com/janssenda-adobe/UST-Install-Scripts"
     }
 
     Write-Host "- Completed - You can begin to edit configuration files in:`n"
-    Print-Color "- $USTFolder" Green
+    Print-Color "  $USTFolder" Green
     Write-Host ""
 
 }else{
