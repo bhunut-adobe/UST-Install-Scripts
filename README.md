@@ -95,3 +95,13 @@ Example calls with flags:
 <code>sudo sh -c 'wget -O ins.sh https://git.io/vx8JV; chmod 777 ins.sh; ./ins.sh --install-python; rm ins.sh;'</code>
 
 <code>sudo sh -c 'wget -O ins.sh https://git.io/vx8JV; chmod 777 ins.sh; ./ins.sh --install-python --ust-version 2.3; rm ins.sh;'</code>
+
+### Release Notes
+https://github.com/janssenda-adobe/UST-Install-Scripts/releases/tag/2.0
+
+This release introduces smart versioning. The script will choose which python build of the User Sync tool to download, depending on your host Ubuntu version and the User Sync version you have selected. Running the script with no arguments will automatically fetch the latest release version of User Sync (currently 2.2.2), and check your system to determine which build to get. User Sync version can be specified by --ust-version. The default version is 2.2.2, but 2.3rc4 can be fetched by using --ust-version 2.3.
+
+Python install has moved to a command line argument of --install-python. When specified, versioning is affected. The script will calculate the maximum supported python version for your host that corresponds to the max python version of the user-sync executable for the chosen UST version. The script install or update that version of python during the process. This is now the recommended option, but is intentionally left out of default. The script can correctly map versioning for Ubuntu 12.04 - 18.04. All LTS (even) releases are fully supported. Intermediate (odd) releases are supported, but special cases are required for some. The user will be prompted for those options during install.
+
+Version 2.0 also incorporates packaging. Using the --offline flag along with --ust-version and --install-python, you can build a .tar.gz archive of the fully configured UST instance for any of the supported Ubuntu distributions and any of their supported python/user-sync combinations. Leave off --install-python to build a compatible package for any distro that will not require any python modification.
+
