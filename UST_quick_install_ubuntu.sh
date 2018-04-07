@@ -356,7 +356,7 @@ function getUSTFiles(){
     printf "#!/usr/bin/env bash\n./user-sync --users mapped --process-groups" > "$USTFolder/run-user-sync.sh"
 
     printColorOS "Generating shell script for certificate generation..."
-    SSLString="openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout private.key -out certificate_pub.crt"
+    SSLString="openssl req -x509 -sha256 -nodes -days 9125 -newkey rsa:2048 -keyout private.key -out certificate_pub.crt"
     printf "#!/usr/bin/env bash\n$SSLString" > "$USTFolder/sslCertGen.sh"
 
     printColorOS "UST installed succesfully!" green
