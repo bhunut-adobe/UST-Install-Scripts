@@ -1,30 +1,41 @@
 param([String]$py="3",
       [Switch]$cleanpy=$false,
-      [Switch]$offline=$false)
+      [Switch]$offline=$false,
+      [String]$ustversion="2.2.2")
 
-if ($py -eq "2"){
-    $pythonVersion = "2"
-} elseif ($py -eq "none"){
-    $pythonVersion = "none"
+if ( -Not ( $ustversion -eq "2.2.2" -or $ustversion -eq "2.3" )) {
+    Write-Host "UST Version '$ustversion' - Invalid version (2.2.2 or 2.3 only)"
+    exit
 }
-else {$pythonVersion = "3"}
 
-$UST_Version = "2.2.2"
+if ( -Not ( $py -eq "2" -or $py -eq "3" -or $py -eq "none")) {
+    Write-Host "Py Version '$py' - Invalid version (2 or 3, or none only)"
+    exit
+}
+
+$pythonVersion = $py
 $ErrorActionPreference = "Stop"
 
 # Array for collecting warnings to display at end of install
 $warnings = New-Object System.Collections.Generic.List[System.Object]
 
 # URL's Combined for convenience here
-$notepadURL = "https://notepad-plus-plus.org/repository/7.x/7.5.6/npp.7.5.6.bin.x64.zip"
+$notepadURL = "https://github.com/janssenda-adobe/UST-Install-Scripts/raw/master/Util/npp.7.5.6.bin.x64.zip"
 $7ZipURL = "https://github.com/janssenda-adobe/UST-Install-Scripts/raw/master/Util/7-Zip64.zip"
-$USTPython2URL = "https://github.com/adobe-apiplatform/user-sync.py/releases/download/v2.2.2/user-sync-v2.2.2-windows-py2714.tar.gz"
-$USTPython3URL = "https://github.com/adobe-apiplatform/user-sync.py/releases/download/v2.2.2/user-sync-v2.2.2-windows-py363.tar.gz"
-$USTExamplesURL = "https://github.com/adobe-apiplatform/user-sync.py/releases/download/v2.2.1/example-configurations.tar.gz"
 $openSSLBinURL = "https://indy.fulgan.com/SSL/openssl-1.0.2l-x64_86-win64.zip"
 $adobeIOCertScriptURL = "https://raw.githubusercontent.com/janssenda-adobe/UST-Install-Scripts/master/UST_io_certgen.ps1"
 $Python2URL = "https://www.python.org/ftp/python/2.7.14/python-2.7.14.amd64.msi"
 $Python3URL = "https://www.python.org/ftp/python/3.6.4/python-3.6.4-amd64.exe"
+
+if ( $ustversion -eq "2.3" ) {
+    $USTPython2URL = "https://github.com/adobe-apiplatform/user-sync.py/releases/download/v2.3rc4/user-sync-v2.3rc4-win64-py2714.tar.gz"
+    $USTPython3URL = "https://github.com/adobe-apiplatform/user-sync.py/releases/download/v2.3rc4/user-sync-v2.3rc4-win64-py363.tar.gz"
+    $USTExamplesURL = "https://github.com/adobe-apiplatform/user-sync.py/releases/download/v2.3rc4/example-configurations.tar.gz"
+} else {
+    $USTPython2URL = "https://github.com/adobe-apiplatform/user-sync.py/releases/download/v2.2.2/user-sync-v2.2.2-windows-py2714.tar.gz"
+    $USTPython3URL = "https://github.com/adobe-apiplatform/user-sync.py/releases/download/v2.2.2/user-sync-v2.2.2-windows-py363.tar.gz"
+    $USTExamplesURL = "https://github.com/adobe-apiplatform/user-sync.py/releases/download/v2.2.1/example-configurations.tar.gz"
+}
 
 # Set global parameters
 # TLS 1.2 protocol enable - required to download from GitHub, does NOT work on Powershell < 3
@@ -34,7 +45,7 @@ $Python3URL = "https://www.python.org/ftp/python/3.6.4/python-3.6.4-amd64.exe"
 $DownloadFolder = "$env:TEMP\USTDownload"
 
 # UST folder location
-$USTInstallDir = (Get-Item -Path ".\" -Verbose).FullName.TrimEnd("\") + "\UST_Install"
+$USTInstallDir = (Get-Item -Path ".\" -Verbose).FullName.TrimEnd('\')+"\User-Sync-${ustversion}"
 
 
 function Print-Color ($msg, $color) {
@@ -99,9 +110,9 @@ function Expand-TarGZ() {
         Start-Process -FilePath $7zpath -ArgumentList "x `"$Path`" -aoa -y -o`"$DownloadFolder`"" -Wait
         Start-Process -FilePath $7zpath -ArgumentList "x `"$DownloadFolder\$filename`" -aoa -ttar -y -o`"$Output`"" -Wait
     } catch {
-       Print-Color "Error while extracting $path..." red
-       Print-Color ("- " + $PSItem.ToString()) red
-       $warnings.Add("- " + $PSItem.ToString())
+        Print-Color "Error while extracting $path..." red
+        Print-Color ("- " + $PSItem.ToString()) red
+        $warnings.Add("- " + $PSItem.ToString())
     }
 }
 
@@ -347,7 +358,7 @@ function Package(){
 
     Banner -message "Packaging"
 
-    $filename = "UST_v$UST_Version.zip"
+    $filename = "UST_${ustversion}_py${pythonVersion}.zip"
 
     try    {
         Write-Host "- Creating $filename with Python $pythonVersion"
@@ -465,10 +476,10 @@ function Get-Python () {
 
 function Cleanup() {
     try {
-      if ($offline){
-          #Delete UST Folder after archive is built for offline mode
-          Remove-Item -Path $USTFolder -Recurse -Confirm:$false -Force
-      }
+        if ($offline){
+            #Delete UST Folder after archive is built for offline mode
+            Remove-Item -Path $USTFolder -Recurse -Confirm:$false -Force
+        }
 
     } catch {}
     try{
@@ -480,21 +491,29 @@ function Cleanup() {
 # Main
 if ((New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)){
 
-    $introBanner = "
-                   _   _                 ___
-                  | | | |___ ___ _ _    / __|_  _ _ _  __
-                  | |_| (_-</ -_) '_|   \__ \ || | ' \/ _|
-                   \___//__/\___|_|     |___/\_, |_||_\__|
-                                             |__/
-    "
 
-    Print-Color "`n============================================================================" Cyan
-    Print-Color "v $UST_Version" Cyan
-    Print-Color $introBanner Cyan
-    Banner -message "Adobe User Sync Tool Quick Install" -color Cyan
-    Write-Host ""
+$introBanner = "
+==========================================================
+
+         _   _                 ___
+        | | | |___ ___ _ _    / __|_  _ _ _  __
+        | |_| (_-</ -_) '_|   \__ \ || | ' \/ _|
+         \___//__/\___|_|     |___/\_, |_||_\__|
+                                   |__/
+
+"
+$introText=
+"Windows Quick Install 2.0 for UST v2.2.2 - 2.3rc4
+https://github.com/janssenda-adobe/UST-Install-Scripts"
+
+    Print-Color $introBanner cyan
+    Print-Color $introText green
+    Print-Color "==========================================================`n" cyan
+
+
 
     Print-Color "*** Parameter List ***`n" Green
+    Write-Host "- User-Sync Version: " $ustversion
     Write-Host "- Python Version: " $py
     Write-Host "- Clean Py Install: " $cleanpy
     Write-Host "- Offline Package: " $offline
@@ -565,7 +584,6 @@ if ((New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsI
         $i++
         try {
             $openSSLUSTFolder = Get-OpenSSL
-            $openSSLUSTFolder = ([String]$openSSLUSTFolder).trim()
             break
         }
         catch {
