@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
-# sudo sh -c 'apt-get update &> /dev/null; apt-get install wget openssl libssl-dev -y &> /dev/null;'
+# Run string
+# sudo sh -c 'wget -O ins.sh https://git.io/vx8JV; chmod 777 ins.sh; ./ins.sh; rm ins.sh;'
 
-# sudo sh -c 'curl -s -L https://git.io/vxnQZ > ins.sh; chmod 777 ins.sh; ./ins.sh; rm ins.sh;'
-# sudo sh -c 'wget -O ins.sh https://git.io/vxnQZ &> /dev/null; chmod 777 ins.sh; ./ins.sh -wget; rm ins.sh;'
+# Run first for Ubuntu 12
+# sudo sh -c 'apt-get update; apt-get install wget openssl libssl-dev -y -qq;' &> /dev/null
 
 offlineMode=false
 installPython=false
@@ -57,8 +58,6 @@ else
     USTPython3URL="https://github.com/adobe-apiplatform/user-sync.py/releases/download/v2.2.2/user-sync-v2.2.2-ubuntu1604-py352.tar.gz"
     reqPython3Version="3.5"
 fi
-
-
 
 function printColor(){
 
