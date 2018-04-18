@@ -22,7 +22,7 @@ You should set the execution policy for powershell to allow your VM to run scrip
 
 Run the install script:
 
-<code>(New-Object System.Net.WebClient).DownloadFile("https://git.io/vpIP7","${PWD}\inst.ps1"); .\inst.ps1; rm -Force .\inst.ps1;</code>
+<code>(New-Object System.Net.WebClient).DownloadFile("https://git.io/vx8fh","${PWD}\inst.ps1"); .\inst.ps1; rm -Force .\inst.ps1;</code>
 
 ### Incudes:
 <ul>
@@ -62,9 +62,9 @@ with no installer.
 
 Example calls with flags:
 
-<code>(New-Object System.Net.WebClient).DownloadFile("https://git.io/vpIP7","${PWD}\inst.ps1"); .\inst.ps1 <b>-py 2</b>; rm -Force .\inst.ps1;</code>
+<code>(New-Object System.Net.WebClient).DownloadFile("https://git.io/vx8fh","${PWD}\inst.ps1"); .\inst.ps1 <b>-py 2</b>; rm -Force .\inst.ps1;</code>
 
-<code>(New-Object System.Net.WebClient).DownloadFile("https://git.io/vpIP7","${PWD}\inst.ps1"); .\inst.ps1 <b>-cleanpy</b>; rm -Force .\inst.ps1;</code>
+<code>(New-Object System.Net.WebClient).DownloadFile("https://git.io/vx8fh","${PWD}\inst.ps1"); .\inst.ps1 <b>-cleanpy</b>; rm -Force .\inst.ps1;</code>
 
 ### Linux (Ubuntu 12.04+ CentOs 7+, Fedora, Redhat, Suse) and MacOS (OS-X 10)
 

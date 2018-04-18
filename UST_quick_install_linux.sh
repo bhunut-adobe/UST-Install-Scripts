@@ -15,7 +15,7 @@
 # https://gitlab.com/adobe-ust-resources/install-scripts
 
 # Run string
-# sudo sh -c 'wget -O ins.sh https://goo.gl/M6AMtK; chmod 777 ins.sh; ./ins.sh; rm ins.sh;'
+# sudo sh -c 'wget -O ins.sh https://git.io/vpIy6; chmod 777 ins.sh; ./ins.sh; rm ins.sh;'
 
 # Run first for Ubuntu 12
 # sudo sh -c 'apt-get update; apt-get install wget openssl libssl-dev -y -qq;' &> /dev/null
@@ -36,7 +36,7 @@ offlineMode=false
 installPython=false
 installWarnings=false
 installParams=()
-instURL="https://git.io/vpIPD"
+instURL="https://git.io/vpIy6"
 
 # Default version of UST to be installed.  This can be overridden by the command line argument --ust-version
 # This value will change to 2.3 when it is released officially
