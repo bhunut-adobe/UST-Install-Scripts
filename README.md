@@ -1,4 +1,4 @@
-<img src="Screenshots/cce2.png" height="200"> | <h1>Install Scripts <br/>Adobe User Sync Tool</h1>
+<img src="Screenshots/cce2.png" height="150"> | <h1>Install Scripts <br/>Adobe User Sync Tool</h1>
 ------------ | -------------
 
 
