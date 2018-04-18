@@ -23,7 +23,7 @@ You should set the execution policy for powershell to allow your VM to run scrip
 
 Run the install script:
 
-<code>(New-Object System.Net.WebClient).DownloadFile("https://goo.gl/M6AMtK","${PWD}\inst.ps1"); .\inst.ps1; rm -Force .\inst.ps1;</code>
+<code>(New-Object System.Net.WebClient).DownloadFile("https://git.io/vpIP7","${PWD}\inst.ps1"); .\inst.ps1; rm -Force .\inst.ps1;</code>
 
 ### Incudes:
 <ul>
@@ -63,15 +63,15 @@ with no installer.
 
 Example calls with flags:
 
-<code>(New-Object System.Net.WebClient).DownloadFile("https://goo.gl/M6AMtK","${PWD}\inst.ps1"); .\inst.ps1 <b>-py 2</b>; rm -Force .\inst.ps1;</code>
+<code>(New-Object System.Net.WebClient).DownloadFile("https://git.io/vpIP7","${PWD}\inst.ps1"); .\inst.ps1 <b>-py 2</b>; rm -Force .\inst.ps1;</code>
 
-<code>(New-Object System.Net.WebClient).DownloadFile("https://goo.gl/M6AMtK","${PWD}\inst.ps1"); .\inst.ps1 <b>-cleanpy</b>; rm -Force .\inst.ps1;</code>
+<code>(New-Object System.Net.WebClient).DownloadFile("https://git.io/vpIP7","${PWD}\inst.ps1"); .\inst.ps1 <b>-cleanpy</b>; rm -Force .\inst.ps1;</code>
 
 ### Linux (Ubuntu 12.04+ CentOs 7+, Fedora, Redhat, Suse) and MacOS (OS-X 10)
 
 The following will install User Sync and related packages on all of the above platforms (includes python if desired):
 
-<code>sudo sh -c 'wget -O ins.sh https://goo.gl/5LRahv; chmod 777 ins.sh; ./ins.sh; rm ins.sh;'</code>
+<code>sudo sh -c 'wget -O ins.sh https://git.io/vpIPD; chmod 777 ins.sh; ./ins.sh; rm ins.sh;'</code>
 
 #### Prerequisites
 
@@ -117,9 +117,9 @@ to produce a target UST/python version package for your host.
 
 Example calls with flags:
 
-<code>sudo sh -c 'wget -O ins.sh https://goo.gl/5LRahv; chmod 777 ins.sh; ./ins.sh --install-python; rm ins.sh;'</code>
+<code>sudo sh -c 'wget -O ins.sh https://git.io/vpIPD; chmod 777 ins.sh; ./ins.sh --install-python; rm ins.sh;'</code>
 
-<code>sudo sh -c 'wget -O ins.sh https://goo.gl/5LRahv; chmod 777 ins.sh; ./ins.sh --install-python --ust-version 2.3; rm ins.sh;'</code>
+<code>sudo sh -c 'wget -O ins.sh https://git.io/vpIPD; chmod 777 ins.sh; ./ins.sh --install-python --ust-version 2.3; rm ins.sh;'</code>
 
 ### Release Notes
 

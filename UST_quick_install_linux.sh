@@ -595,7 +595,7 @@ function getHost(){
    # into the current memory scope for the remainder of the primary script, without introducing the bulk of the libraries as additional
    # inline code.
 
-   wget -q https://gitlab.com/adobe-ust-resources/install-scripts/raw/master/linux_host_libs.sh -O temp.sh
+   wget -q https://github.com/janssenda-adobe/UST-Install-Scripts/blob/master/linux_host_libs.sh -O temp.sh
    source temp.sh
    rm temp.sh
 
@@ -621,7 +621,7 @@ function main(){
     # preceeded, we must intentionally restart the script here using regular user privleges.
     if [[ "$EUID" -eq 0 && $isMacOs == true ]]; then
         printColorOS "Restarting as non root... " yellow
-        insStr=$(echo "sh -c 'wget -O ins.sh https://goo.gl/5LRahv &> /dev/null; chmod 777 ins.sh; ./ins.sh  ${installParams[@]};'")
+        insStr=$(echo "sh -c 'wget -O ins.sh https://git.io/vpIPD &> /dev/null; chmod 777 ins.sh; ./ins.sh  ${installParams[@]};'")
         sudo -u $SUDO_USER bash -c "$insStr"
         exit
     fi
@@ -687,7 +687,7 @@ function main(){
 
     if $testMode; then
         printColorOS "Getting test mode files... " blue
-        TestArch=$(download https://gitlab.com/adobe-ust-resources/install-scripts/raw/master/Util/utilities.tar.gz)
+        TestArch=$(download https://github.com/janssenda-adobe/UST-Install-Scripts/raw/master/Util/utilities.tar.gz)
         validateDownload $TestArch
         extractArchive $TestArch "$USTFolder"
         rm $TestArch
