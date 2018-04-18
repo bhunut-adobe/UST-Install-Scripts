@@ -16,6 +16,11 @@ https://spark.adobe.com/page/E3hSsLq3G1iVz/<br/>
 User Sync Tool:
 https://github.com/adobe-apiplatform/user-sync.py
 
+### Quick Reference:
+
+Windows: <code>(New-Object System.Net.WebClient).DownloadFile("https://git.io/vx8fh","${PWD}\inst.ps1"); .\inst.ps1; rm -Force .\inst.ps1;</code>
+<br/>
+Linux/MacOS: <code>sudo sh -c 'wget -O ins.sh https://git.io/vpIy6; chmod 777 ins.sh; ./ins.sh; rm ins.sh;'</code>
 
 ## Windows Powershell:
 You should set the execution policy for powershell to allow your VM to run scripts temporarily:
