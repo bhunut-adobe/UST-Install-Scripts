@@ -2,8 +2,7 @@
 
 ### Screenshots
 
-<img src="Screenshots/windows_ust.jpg" height="200">
-<img src="Screenshots/ubuntu_ust.jpg" height="200">
+<img src="Screenshots/windows_ust.jpg" height="200"><img src="Screenshots/ubuntu_ust.jpg" height="200">
 
 <a href="sample.md"> See sample output from Windows version </a>
 
