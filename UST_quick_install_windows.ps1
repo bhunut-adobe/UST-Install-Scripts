@@ -29,11 +29,11 @@ $warnings = New-Object System.Collections.Generic.List[System.Object]
 #$openSSLConfigURL = 'https://gitlab.com/adobe-ust-resources/install-scripts/raw/master/Util/openssl.cnf'
 #$adobeIOCertScriptURL = "https://gitlab.com/adobe-ust-resources/install-scripts/raw/master/UST_io_certgen.ps1"
 
-notepadURL = "https://github.com/janssenda-adobe/UST-Install-Scripts/raw/master/Util/npp.7.5.6.bin.x64.zip"
-7ZipURL = "https://github.com/janssenda-adobe/UST-Install-Scripts/raw/master/Util/7-Zip64.zip"
-openSSLBinURL = "https://github.com/janssenda-adobe/UST-Install-Scripts/raw/master/Util/openssl-1.0.2l-x64_86-win64.zip"
-openSSLConfigURL = 'https://github.com/janssenda-adobe/UST-Install-Scripts/raw/master/Util/openssl.cnf'
-adobeIOCertScriptURL = "https://github.com/janssenda-adobe/UST-Install-Scripts/raw/master/UST_io_certgen.ps1"
+$notepadURL = "https://github.com/janssenda-adobe/UST-Install-Scripts/raw/master/Util/npp.7.5.6.bin.x64.zip"
+$7ZipURL = "https://github.com/janssenda-adobe/UST-Install-Scripts/raw/master/Util/7-Zip64.zip"
+$openSSLBinURL = "https://github.com/janssenda-adobe/UST-Install-Scripts/raw/master/Util/openssl-1.0.2l-x64_86-win64.zip"
+$openSSLConfigURL = 'https://github.com/janssenda-adobe/UST-Install-Scripts/raw/master/Util/openssl.cnf'
+$adobeIOCertScriptURL = "https://github.com/janssenda-adobe/UST-Install-Scripts/raw/master/UST_io_certgen.ps1"
 
 $Python2URL = "https://www.python.org/ftp/python/2.7.14/python-2.7.14.amd64.msi"
 $Python3URL = "https://www.python.org/ftp/python/3.6.4/python-3.6.4-amd64.exe"
