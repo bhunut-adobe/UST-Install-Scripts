@@ -1,4 +1,7 @@
-# Install Scripts for Adobe User Sync Tool
+
+<img src="Screenshots/cce2.png" height="200"> | <h1>Install Scripts <br/>Adobe User Sync Tool</h1>
+------------ | -------------
+
 
 ### Screenshots
 
