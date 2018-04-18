@@ -36,6 +36,7 @@ offlineMode=false
 installPython=false
 installWarnings=false
 installParams=()
+instURL="https://git.io/vpIPD"
 
 # Default version of UST to be installed.  This can be overridden by the command line argument --ust-version
 # This value will change to 2.3 when it is released officially
@@ -141,7 +142,7 @@ $(tput setaf 5)$fullName $numericalVersion$(tput setaf 6)
 
 
 $(tput setaf 2)Linux Quick Install 2.0 for UST v2.2.2 - 2.3rc4
-https://gitlab.com/adobe-ust-resources/install-scripts    $(tput setaf 6)
+https://github.com/janssenda-adobe/UST-Install-Scripts    $(tput setaf 6)
 =========================================================$(tput sgr 0)
 EOM
 
@@ -621,7 +622,7 @@ function main(){
     # preceeded, we must intentionally restart the script here using regular user privleges.
     if [[ "$EUID" -eq 0 && $isMacOs == true ]]; then
         printColorOS "Restarting as non root... " yellow
-        insStr=$(echo "sh -c 'wget -O ins.sh https://git.io/vpIPD &> /dev/null; chmod 777 ins.sh; ./ins.sh  ${installParams[@]};'")
+        insStr=$(echo "sh -c 'wget -O ins.sh $instURL &> /dev/null; chmod 777 ins.sh; ./ins.sh  ${installParams[@]};'")
         sudo -u $SUDO_USER bash -c "$insStr"
         exit
     fi
