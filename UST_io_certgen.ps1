@@ -30,10 +30,6 @@ if(Test-Path $OpenSSL){
     if($process.ExitCode -eq 0){
         Write-Host "Completed - Certificate located in $USTFolder."
         Pause
-#        try {
-#            # Will not work without GUI
-#            & explorer.exe "https://www.adobe.io/console"
-#        } catch {}
     }else{
         Write-Error "Error Generating Certificate"
     }

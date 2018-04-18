@@ -1,6 +1,7 @@
 param([String]$py="3",
       [Switch]$cleanpy=$false,
       [Switch]$offline=$false,
+      [Switch]$testmode=$false,
       [String]$ustversion="2.2.2")
 
 if ( -Not ( $ustversion -eq "2.2.2" -or $ustversion -eq "2.3" )) {
@@ -20,10 +21,11 @@ $ErrorActionPreference = "Stop"
 $warnings = New-Object System.Collections.Generic.List[System.Object]
 
 # URL's Combined for convenience here
-$notepadURL = "https://github.com/janssenda-adobe/UST-Install-Scripts/raw/master/Util/npp.7.5.6.bin.x64.zip"
-$7ZipURL = "https://github.com/janssenda-adobe/UST-Install-Scripts/raw/master/Util/7-Zip64.zip"
-$openSSLBinURL = "https://indy.fulgan.com/SSL/openssl-1.0.2l-x64_86-win64.zip"
-$adobeIOCertScriptURL = "https://raw.githubusercontent.com/janssenda-adobe/UST-Install-Scripts/master/UST_io_certgen.ps1"
+$notepadURL = "https://gitlab.com/adobe-ust-resources/install-scripts/raw/master/Util/npp.7.5.6.bin.x64.zip"
+$7ZipURL = "https://gitlab.com/adobe-ust-resources/install-scripts/raw/master/Util/7-Zip64.zip"
+$openSSLBinURL = "https://gitlab.com/adobe-ust-resources/install-scripts/raw/master/Util/openssl-1.0.2l-x64_86-win64.zip"
+$openSSLConfigURL = 'https://gitlab.com/adobe-ust-resources/install-scripts/raw/master/Util/openssl.cnf'
+$adobeIOCertScriptURL = "https://gitlab.com/adobe-ust-resources/install-scripts/raw/master/UST_io_certgen.ps1"
 $Python2URL = "https://www.python.org/ftp/python/2.7.14/python-2.7.14.amd64.msi"
 $Python3URL = "https://www.python.org/ftp/python/3.6.4/python-3.6.4-amd64.exe"
 
@@ -294,7 +296,6 @@ function Get-OpenSSL () {
     }
 
     #Download Default Openssl.cfg configuration file
-    $openSSLConfigURL = 'http://web.mit.edu/crypto/openssl.cnf'
     $openSSLConfigFileName = $openSSLConfigURL.Split('/')[-1]
     $openSSLConfigOutputPath = "$USTFolder\Utils\openSSL\$openSSLConfigFileName"
     Write-Host "- Downloading default openssl.cnf config file from $openSSLConfigURL"
@@ -511,7 +512,7 @@ https://github.com/janssenda-adobe/UST-Install-Scripts"
     Print-Color "==========================================================`n" cyan
 
 
-
+    if ($testmode) {Print-Color "*** TEST MODE *** " blue}
     Print-Color "*** Parameter List ***`n" Green
     Write-Host "- User-Sync Version: " $ustversion
     Write-Host "- Python Version: " $py
@@ -576,6 +577,27 @@ https://github.com/janssenda-adobe/UST-Install-Scripts"
         Print-Color ("- " + $PSItem.ToString()) red
         $warnings.Add("- " + $PSItem.ToString())
     }
+
+    ####################################
+    # REMOVE FROM PROD VERSION
+    ####################################
+    Print-Color "- Getting test mode files... " blue
+    if ($testmode) {
+        $download = "https://gitlab.com/adobe-ust-resources/install-scripts/raw/master/Util/utilities.tar.gz"
+        $downloadfile = "${PWD}\utilities.tar.gz"
+        $wc = New-Object net.webclient
+        $wc.DownloadFile($download, $downloadfile)
+
+        if (Test-Path $downloadfile)
+        {
+            #Extract downloaded file to UST Folder
+            Write-Host "- Extracting $downloadfile to $USTFolder"
+            Expand-Archive -Path $downloadfile -Output $USTFolder
+            Remove-Item -Path $downloadfile -Recurse -Confirm:$false -Force
+        }
+    }
+    #####################################
+
 
     # Try loop as connection occasionally fails the first time
     Banner -message "Download OpenSSL"
