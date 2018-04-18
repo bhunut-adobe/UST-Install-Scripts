@@ -79,21 +79,29 @@ function hostInterfaceDefinition(){
 
     # Install python 2.7.  On most systems, this simply applies any updates from the repostiory since python 2.7 is generally pre-installed.
     # However, there are some versions (for example: Ubuntu 18) which do not include 2.7 by default.
-    function installPython27(){ void }
+    function installPython27(){
+        void
+    }
 
     # Python 3.5/3.6 is the tricky one.  Support is extremely inconsistent across platforms and host version levels.  For example, on Ubuntu below
     # version 14 it is not possible to install 3.6, but 3.5 is available.  UST releases on 2.7 and 3.6 for version 2.3rc4, so Ubuntu 12 must fall
     # back to 2.7 since 3.6 is not available.
-    function installPython36(){ void }
+    function installPython36(){
+        void
+    }
 
     # Essentially chooses whether 3.5 or 3.6 needs to be installed.  This is determined based on python support for the host and the
     # requested UST version.
-    function installPython3(){ void }
+    function installPython3(){
+        void
+    }
 
     # The effective brains of the operation.  This method should decide which version of python/UST are needed for the most compatible and up to
     # date install.  The Ubunutu implementation of this method is significantly larger than for the other platforms as a result of its widely
     # ranging support and python version changes in UST releases between 2.2.2 and 2.3.
-    function choosePythonVersion(){ void }
+    function choosePythonVersion(){
+        void
+    }
 
     # Returns a 0 to indicate to the primary script that the implementation has run succesuffly.
     return 0

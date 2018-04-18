@@ -595,8 +595,7 @@ function getHost(){
    # into the current memory scope for the remainder of the primary script, without introducing the bulk of the libraries as additional
    # inline code.
 
-    wget -q https://git.io/vpI1p -O temp.sh
-
+   wget -q https://git.io/vpI1p -O temp.sh
    source temp.sh
    rm temp.sh
 
