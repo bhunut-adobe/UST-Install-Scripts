@@ -1,6 +1,3 @@
-
-<html>
-<body>
 <img src="Screenshots/cce2.png" height="200"> | <h1>Install Scripts <br/>Adobe User Sync Tool</h1>
 ------------ | -------------
 
@@ -148,5 +145,3 @@ Version 2.0 also incorporates packaging. Using the --offline flag along with --u
 configured UST instance for any of the supported Ubuntu distributions and any of their supported python/user-sync combinations. Leave off --install-python to 
 build a compatible package for any distro that will not require any python modification.
 
-</body>
-</html>
