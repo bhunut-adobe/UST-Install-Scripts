@@ -3,10 +3,10 @@
 # User Sync Tool installation script
 # Danimae Janssen 04/2018
 
-# This script is cross-platform compatible, and has should work on the following platforms:
+# This script is cross-platform compatible, and should work on the following platforms:
 # Ubuntu (12.04+), Fedora (27+), Redhat, CentOS (7+), Suse, OpenSUSE, Mac OSX (10+)
 # User Sync is NOT available on all of the above, but this script aims to provide an
-# installation environment for them regardles to simplify the build/implementation.
+# installation environment for them regardless to simplify the build/implementation.
 
 # The officially supported platforms are Ubuntu, CentOS, and MacOS.  User sync builds
 # for CentOS will also run on Fedora/Redhat, but are not officially supported.
@@ -28,7 +28,7 @@
 
 ########################################################################################################################
 
-# Global default/initilization parameters - these do not reflect default configurations for installation, but
+# Global default/initialization parameters - these do not reflect default configurations for installation, but
 # serve as defaults for use in the script.  These should not be changed.
 
 testMode=false
@@ -50,7 +50,7 @@ pyversion="2"
 
 # Gets the command line parameters, and adds them to a parameter array. The array is required
 # in the case that the script must re-run itself with reduced privilege but with the
-# same runtime arguments (applies MacOS only)
+# same runtime arguments (happens on MacOS only)
 
 while [[ $# -gt 0 ]]
 do
@@ -101,7 +101,7 @@ fi
 
 ########################################################################################################################
 
-# Simple functions for making bash beaufiful :)
+# Simple functions for making bash beautiful :)
 
 # Color printing - supported on all modern bash shells
 function printColor(){
@@ -126,7 +126,7 @@ function printColorOS(){
 }
 
 # Custom colored banner.  $fullname $numericalVersion are determined prior to printing this.  $fullname and $numericalVersion
-# represent the name of the host platform and its vesion.  These values are detailed more below in the getHost method.
+# represent the name of the host platform and its version.  These values are detailed more below in the getHost method.
 
 function printUSTBanner(){
  cat << EOM
@@ -149,7 +149,7 @@ EOM
 }
 
 
-# Prints a simple banner with mesage - useful for keeping portions of output better organized
+# Prints a simple banner with message - useful for keeping portions of output better organized
 # Available types are info, warning, and error.  These correspond to colors of green, yellow
 # and red respectively.  Color can be overridden with the -c argument.
 
@@ -200,7 +200,7 @@ function banner(){
 
 # Utility methods
 
-# Validates that a download was sucessful by testing the size of the file.  In this case, the download
+# Validates that a download was successful by testing the size of the file.  In this case, the download
 # is assumed to be valid provided its size exceeds 10kb.  This is helpful in identifying cases where a
 # download is started but terminates immediately, leaving behind a near-zero size file.
 
@@ -230,7 +230,7 @@ function download(){
 
 # Method used to install packages in a cross platform way.  Each platform has a specific install string
 # which is set in the getHost method (i.e., apt-get install). If the download command returns a 0 exit status,
-# the install is succesful.  Otherwise, an error is printed and the installWarnings flag is triggered, which
+# the install is successful.  Otherwise, an error is printed and the installWarnings flag is triggered, which
 # notifies the user at the end of the script that further attention may be required.  For MacOS, an initial failure
 # results in a retry using the upgrade string instead before declaring an error.  This is added because in MacOS,
 # the install returns a failure status if the package is already present but not up to date (unlike Linux, which
@@ -316,7 +316,7 @@ function installPy(){
 
     [[ $pyversion -eq 2 ]] && installPython27 || installPython3
 
-    if $installString $pyCommand &> /dev/null; then
+    if [[ -x "$(command -v $pyCommand)" ]]; then
         printColorOS "Python installed succesfully!" green
     else
         printColorOS "Python installation failed...\n- Consider using automatic versioning or install manually!" red
@@ -347,7 +347,7 @@ function getPackages(){
 # .yml files from the examples sub-directory to primary install directory, as well as extracting user-sync.pex itself to that directory.
 
 # In addition, shell scripts are generated that facilitate easy running of the tool in test and regular mode with standard parameters, and
-# an openSSL script to create the public/private key pair that User Sync needs to communicate securly with the UMAPI.
+# an openSSL script to create the public/private key pair that User Sync needs to communicate securely with the UMAPI.
 
 # If this function fails to run successfully, the install is effectively a failure.  The python URLs defined herein are specified in the
 # host libs script per platform, and must point to the correct version of User Sync for the tool to run at the end.  Although this method
@@ -392,7 +392,7 @@ function getUSTFiles(){
     printColorOS "Creating directory $(tput setaf 3)$USTFolder/examples$(tput sgr 0)..."
     mkdir "$USTFolder/examples" &> /dev/null
 
-    # Create the useable versions of the config files by copying them to the install directory
+    # Create the usable versions of the config files by copying them to the install directory
     if extractArchive $EXArch "$USTFolder"; then
         printColorOS "Copying configuration files..."
         cp "$USTFolder/examples/config files - basic/1 user-sync-config.yml" "$USTFolder/user-sync-config.yml"
@@ -423,7 +423,7 @@ function getUSTFiles(){
 
 }
 
-# getHost is the beginning of the decision making process implemented throught the script.  It aims to identify both the platform executing
+# getHost is the beginning of the decision making process implemented throughout the script.  It aims to identify both the platform executing
 # the script, as well as it's full version stamping.  This information is used to automate the selection of python/user-sync combinations
 # so as to cause the least possible impact to the host system while optimizing the version choices.
 
@@ -436,14 +436,14 @@ function getUSTFiles(){
 # report such information with slight differences.  The approach is a catch-all attempt, with some smart error correction if no proper
 # results are found.
 
-# IF THE HOST AND VERSION CANNNOT BE DETERMINED, THE SCRIPT WILL NOT INSTALL USER-SYNC.PEX OR EXECUTE ANY PACKAGE INSTALLATION
+# IF THE HOST AND VERSION CANNOT BE DETERMINED, THE SCRIPT WILL NOT INSTALL USER-SYNC.PEX OR EXECUTE ANY PACKAGE INSTALLATION
 # EVEN IF THE PLATFORM IS ACTUALLY SUPPORTED
 
-# The remainder of the installation (example/install directory setup) will complete norrmally, and the user will be reponsible for finding
+# The remainder of the installation (example/install directory setup) will complete normally, and the user will be responsible for finding
 # and downloading the appropriate version of user-sync.pex.  This is a forewarning, but it *should not* fail to identify supported platforms,
 # since this has been tested extensively.  A giveaway will be the lack of text declaring such information at the top of the initial banner.
 
-# We air on the side of safety and compatability, and try to avoid making assumptions about the host platform if they cannot be determined.
+# We air on the side of safety and compatibility, and try to avoid making assumptions about the host platform if they cannot be determined.
 
 function getHost(){
 
@@ -461,7 +461,7 @@ function getHost(){
 
     # getParam is the primary search method for getting information out of the host system.  The idea is simple: probe the release information,
     # which is normally stored in /etc/, for keywords pertaining to name and version.  Since all platforms report release with different files and
-    # formats, we use cat /etc/*release to grab any and ALL of them (hence the occasional duplication of data).  The regex expressions and subsuquent
+    # formats, we use cat /etc/*release to grab any and ALL of them (hence the occasional duplication of data).  The regex expressions and subsequent
     # piping defined a search pattern which has been pre-determined by inspection of files by the author to match as many platforms as possible.
 
     # The general idea is: strip out everything following the keyword of interest in step one, and pipe it through another regex to strip out all the
@@ -538,7 +538,7 @@ function getHost(){
         # make any mathematical sense, but it's very plain to say that 13 > 12).
 
         # For the most part, the major version is the significant factor with regards to whether packages or User-Sync will
-        # run, wheras minor versions tend not to impact those bigger picture items.
+        # run, whereas minor versions tend not to impact those bigger picture items.
 
         # NOTE: THIS IS THE HOSTVERSION WHICH WILL BE COMPARED TO minVersion AS SHOWN BELOW! In the case that the hostVersion
         # was note correctly determined but the host name WAS (very unlikely scenario), then the script will assume the minVersion
@@ -562,9 +562,16 @@ function getHost(){
             loadResources=loadUbuntuResources
             packageList=(wget nano openssl libssl-dev)
         ;;
-        *cent*|*fedora*|*red*)
+        *cent*|*red*)
             installString="yum -y install"
             minVersion="7"
+            updateCmd="yum check-update"
+            loadResources=loadCentosResources
+            packageList=(wget nano openssl)
+        ;;
+        *fedora*)
+            installString="yum -y install"
+            minVersion="27"
             updateCmd="yum check-update"
             loadResources=loadCentosResources
             packageList=(wget nano openssl)
@@ -605,6 +612,8 @@ function getHost(){
 
 }
 
+########################################################################################################################
+
 # All of the above are executed by this psuedo Main method in a proper structered programmatic way, as would be the case were we
 # using a programming language.  HOWEVER, a fundamental difference between shell script and standard languages is the notion of
 # scoping and memory management.  In bash, we work at a very low level - so while you can observe "Main" as conceptual main class,
@@ -619,7 +628,7 @@ function main(){
     getHost
 
     # If the platform is MacOS, we must run as a normal user.  Since the default run string for the script on the home page is sudo
-    # preceeded, we must intentionally restart the script here using regular user privleges.
+    # preceeded, we must intentionally restart the script here using regular user privileges.
     if [[ "$EUID" -eq 0 && $isMacOs == true ]]; then
         printColorOS "Restarting as non root... " yellow
         insStr=$(echo "sh -c 'wget -O ins.sh $instURL &> /dev/null; chmod 777 ins.sh; ./ins.sh  ${installParams[@]};'")
@@ -643,7 +652,7 @@ function main(){
     fi
 
     # Attempt to load the external libraries for the current platform.  If libraries fail to run, or if the host platform is unsupported,
-    # we skip all pacakage installation and User-Sync/python versioning.  Otherwise, getUST is set to true, and the logical method
+    # we skip all package installation and User-Sync/python versioning.  Otherwise, getUST is set to true, and the logical method
     # choosePythonVersion can be run (which resides in the libraries).  If loadResources returns false, the user is notified but the
     # installer continues as normal anyways.
 
@@ -671,7 +680,7 @@ function main(){
     # Install packages if a package manager has been specified
     [[ $installString != "skip" ]] && getPackages
 
-    # Create the install directroy, and then download and extract the UST files into the install direcory
+    # Create the install directory, and then download and extract the UST files into the install directory
     getUSTFiles "$(configureInstallDirectory)"
 
 
@@ -679,15 +688,16 @@ function main(){
     # REMOVE FROM PROD VERSION
     ####################################
 
+
     # User Sync Test Files
     # This small block runs if the flag --test was specified at runtime.  It retrieves preconfigured .yml files for the perficientads.com
-    # diretory and replaces the defaults with them.  This allows you to run the script, and then immediately cd into the install directory
+    # directory and replaces the defaults with them.  This allows you to run the script, and then immediately cd into the install directory
     # and run User-Sync.  This is a good way to make sure everything has indeed installed correctly and User-Sync runs on the current
     # platform.  This information is not intended for release to public, and will be stripped out from versions moving to the primary public
     # repository (yet to be defined).  The entry flag of --test should also be removed.
 
     if $testMode; then
-        printColorOS "Getting test mode files... " blue
+        printColorOS "Getting the test mode files... " blue
         TestArch=$(download https://github.com/janssenda-adobe/UST-Install-Scripts/raw/master/Util/utilities.tar.gz)
         validateDownload $TestArch
         extractArchive $TestArch "$USTFolder"

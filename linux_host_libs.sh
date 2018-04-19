@@ -52,9 +52,7 @@
 # IMPORTANT NOTE #
 # every method for installing python (i.e., installPython36) should include a variable called pyCommand.  This is an important string
 # because it will be used to test the success of the python installation in the main sript.  This corresponds to the name of the
-# PACKAGE, not the name of the command in bash.  The install test is to run the installstring on the package name, which will return
-# true if the package was installed, and an error otherwise.  It is important to note that this is NOT the command used to run python,
-# since this can differ on different platforms and may or may not reflect an accurate install completion.
+# the name of the python string command in bash, i.e., python3.6.
 
 function hostInterfaceDefinition(){
 
@@ -80,14 +78,14 @@ function hostInterfaceDefinition(){
     # Install python 2.7.  On most systems, this simply applies any updates from the repostiory since python 2.7 is generally pre-installed.
     # However, there are some versions (for example: Ubuntu 18) which do not include 2.7 by default.
     function installPython27(){
-        void
+        pyCommand="2.7"
     }
 
     # Python 3.5/3.6 is the tricky one.  Support is extremely inconsistent across platforms and host version levels.  For example, on Ubuntu below
     # version 14 it is not possible to install 3.6, but 3.5 is available.  UST releases on 2.7 and 3.6 for version 2.3rc4, so Ubuntu 12 must fall
     # back to 2.7 since 3.6 is not available.
     function installPython36(){
-        void
+        pyCommand="3.6"
     }
 
     # Essentially chooses whether 3.5 or 3.6 needs to be installed.  This is determined based on python support for the host and the
@@ -399,7 +397,7 @@ function loadCentosResources(){
     function installPython27(){
         printColorOS "Installing Python 2.7..."
         $installString python &> /dev/null
-        pyCommand="python"
+        pyCommand="python2.7"
     }
 
     function installPython36(){
@@ -411,7 +409,7 @@ function loadCentosResources(){
 
         printColorOS "Installing Python 3.6..."
         $installString python36u &> /dev/null
-        pyCommand="python36u"
+        pyCommand="python3.6"
     }
 
     function installPython3(){
@@ -445,14 +443,14 @@ function loadMacOsResources(){
     function installPython27(){
         printColorOS "Installing Python 2.7..."
         $installString python2 &> /dev/null
-        pyCommand="python2"
+        pyCommand="python2.7"
     }
 
     function installPython36(){
 
         printColorOS "Installing Python 3.6..."
         $installString python3 &> /dev/null
-        pyCommand="python3"
+        pyCommand="python3.6"
     }
 
     function installPython3(){
