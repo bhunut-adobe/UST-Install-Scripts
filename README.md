@@ -1,4 +1,4 @@
-<img src="Screenshots/cce2.png" height="200"> | <h1>Install Scripts <br/>Adobe User Sync Tool</h1>
+<img src="Screenshots/cce2.png" height="150"> | <h1>Install Scripts <br/>Adobe User Sync Tool</h1>
 ------------ | -------------
 
 
@@ -16,11 +16,14 @@ https://spark.adobe.com/page/E3hSsLq3G1iVz/<br/>
 User Sync Tool:
 https://github.com/adobe-apiplatform/user-sync.py
 
+<hr/>
+
 ### Quick Reference:
 
-Windows: <code>(New-Object System.Net.WebClient).DownloadFile("https://git.io/vx8fh","${PWD}\inst.ps1"); .\inst.ps1; rm -Force .\inst.ps1;</code>
-<br/>
-Linux/MacOS: <code>sudo sh -c 'wget -O ins.sh https://git.io/vpIy6; chmod 777 ins.sh; ./ins.sh; rm ins.sh;'</code>
+**Windows:**<br/> <code>(New-Object System.Net.WebClient).DownloadFile("https://git.io/vx8fh","${PWD}\inst.ps1"); .\inst.ps1; rm -Force .\inst.ps1;</code>
+
+**Linux/MacOS:**<br/> <code>sudo sh -c 'wget -O ins.sh https://git.io/vpIy6; chmod 777 ins.sh; ./ins.sh; rm ins.sh;'</code>
+<hr/>
 
 ## Windows Powershell:
 You should set the execution policy for powershell to allow your VM to run scripts temporarily:
@@ -72,6 +75,8 @@ Example calls with flags:
 <code>(New-Object System.Net.WebClient).DownloadFile("https://git.io/vx8fh","${PWD}\inst.ps1"); .\inst.ps1 <b>-py 2</b>; rm -Force .\inst.ps1;</code>
 
 <code>(New-Object System.Net.WebClient).DownloadFile("https://git.io/vx8fh","${PWD}\inst.ps1"); .\inst.ps1 <b>-cleanpy</b>; rm -Force .\inst.ps1;</code>
+
+<hr/>
 
 ### Linux (Ubuntu 12.04+ CentOs 7+, Fedora, Redhat, Suse) and MacOS (OS-X 10)
 
@@ -126,6 +131,8 @@ Example calls with flags:
 <code>sudo sh -c 'wget -O ins.sh https://git.io/vpIy6; chmod 777 ins.sh; ./ins.sh --install-python; rm ins.sh;'</code>
 
 <code>sudo sh -c 'wget -O ins.sh https://git.io/vpIy6; chmod 777 ins.sh; ./ins.sh --install-python --ust-version 2.3; rm ins.sh;'</code>
+
+<hr/>
 
 ### Release Notes
 
