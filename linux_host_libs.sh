@@ -210,6 +210,8 @@ function loadUbuntuResources(){
              *) ;;
         esac
 
+        [[ $(isPyVersionInstalled "2.7") == true ]] && py27Needed=false;
+
         # Ask the user for permission to install python 2.7, since there is no way to satisfy the specified requirements without
         # installing python 2.7.
         if $py27Needed && ! $installPython; then
