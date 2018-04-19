@@ -521,16 +521,30 @@ function getHost(){
         # If $fullName is wrong, we make a sweeping attempt to get something for it by blindly grabbing the first
         # line of cat /etc/*release.  At least then we can get SOME useful output instead of nothing.
         if [[ $(echo $fullName | wc -c) -lt 3 ]]; then
+            fullName=$(getParam "DISTRIB_ID")
+        fi
+
+        if [[ $(echo $fullName | wc -c) -lt 3 ]]; then
             fullName=$(cat /etc/*release | grep -Po '\A.*')
             fullName=$(filterString "$fullName")
         fi
 
         # Same as above: check if $numericalVersion contains information.  If not, we make a blind guess that
         # the $fullName contains the version number within it.  If not, we are out of luck!! :(
+        if [[ $(echo $numericalVersion | wc -c) -lt 3 ]]; then
+            numericalVersion=$(getParam "DISTRIB_RELEASE")
+        fi
+
         if [[ $(echo $numericalVersion | wc -c) -lt 1 ]]; then
             numericalVersion=$(echo $fullName | grep -Po '\d.+?(?=\s)')
             numericalVersion=$(filterString "$numericalVersion")
         fi
+
+
+#        echo $fullName
+#        echo $numericalVersion
+#
+#        exit
 
         # The hostVersion is the MAJOR version number only (so for Ubuntu 16.04, hostVersion = 16).  This is helpful
         # in narrowing down platform choices in the host libs without worrying about comparing minor versions, which may
@@ -656,7 +670,7 @@ function main(){
     # choosePythonVersion can be run (which resides in the libraries).  If loadResources returns false, the user is notified but the
     # installer continues as normal anyways.
 
-    if $loadResources &> /dev/null; then
+    if $loadResources; then
         getUST=true
         choosePythonVersion
     else
