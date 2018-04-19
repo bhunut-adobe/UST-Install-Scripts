@@ -104,9 +104,17 @@ $DownloadFolder = "$env:TEMP\USTDownload"
 
 $USTInstallDir = (Get-Item -Path ".\" -Verbose).FullName.TrimEnd('\')+"\User-Sync-${ustversion}"
 
+########################################################################################################################
+
+# Simple methods for making output prettier!
+
 function Print-Color ($msg, $color) {
     Write-Host $msg -ForegroundColor $color
 }
+
+# Prints a simple banner with message - useful for keeping portions of output better organized
+# Available types are info, warning, and error.  These correspond to colors of green, yellow
+# and red respectively.  Color can be overridden with the -color argument.
 
 function Banner {
     Param(
@@ -134,6 +142,9 @@ function Banner {
 }
 
 
+# Expand-Zip uses native windows functionality (backwards compatible through Powershel 2.0) to unzip an archive.
+# Usage: Expand-Zip path output
+
 function Expand-Zip() {
     param(
         [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
@@ -150,6 +161,12 @@ function Expand-Zip() {
     }
 
 }
+
+# Expands a .tar.gz file using the portable version of 7-Zip whose URL is located above.  7-Zip is downloaded but not
+# installed during the setup proces.  This must be split into a two step process, in order to all for the possibility
+# that the install directory has spaces in the name. Piping IO stream output through 7-Zip is more elegant, but does not
+# work correctly with spaced paths leading to the 7zip executable. See 7-Zip documentation for command line options.
+# Usage: Expand-TarGZ path output
 
 function Expand-TarGZ() {
     param(
@@ -172,6 +189,11 @@ function Expand-TarGZ() {
     }
 }
 
+
+# Expand-Archive consists of a combination of the Expand-Zip and Expand-TarGZ methods in order to simplify archive extraction.
+# Instead worrying about the archive type, one must simply use Expand-Archive for either of the bove with a path and destination!
+# Usage: Expand-Archive path destination
+
 function Expand-Archive(){
     param(
         [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
@@ -191,6 +213,18 @@ function Expand-Archive(){
     }
 
 }
+
+# Sometimes it is desirable to remove an existing version of python so that the correct one can be installed.  One such example
+# is if a user has a pre-installed version of python, but has and out of date version or the wrong architecture (x86).  This method
+# streamlines complete removal of any previous installations by scanning the registry for python uninstaller entries.
+
+# The process is to search through each uninstall string entry, and checking whether that entry contains a regex match to "Python".
+# If so, the provided uninstall string will be executed, and the entry is removed from the registry.  If there are unused leftover keys,
+# then they are removed as well.
+
+# In addtion, any leftover system folders for python are removed as well (see the $systemPaths array).  The uninstaller will not do anything
+# if no matches are found initially.
+
 
 function Remove-Python(){
     Banner "Uninstalling Python" -type Info
