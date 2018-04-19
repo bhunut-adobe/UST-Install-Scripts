@@ -1,33 +1,66 @@
-param([String]$py="3",
-      [Switch]$cleanpy=$false,
-      [Switch]$offline=$false,
-      [Switch]$testmode=$false,
-      [String]$ustversion="2.2.2")
+
+# User Sync Tool installation script
+# Danimae Janssen 04/2018
+
+# This script is for all versions of Windows (server and normal) running User-Sync.
+# Versions of UST will run all the way back to Server 2008, but due to TLS and default
+# Powershell restrictions, this script will run only on Server 2012+, and (Non-Server) Windows 7+
+
+# This cript can be run with or without a GUI platform, and therefore should be applicable to nano
+# server builds as well as core (although core technically does include a limited GUI functionality).
+# It is very possible to remote into a Windows server instance an run this script via terminal alone
+# with successful results, although most clients opt for using a GUI anyways since it makes User-Sync
+# configuration significantly easier.
+
+# The minimum Powershell version is 3.0, which is supported by default on server 2012+, but can also be
+# installed on server 2008 if the correct .NET support is added as well.  We do not recommend versions
+# before older than 2012 for long term support.
+
+# For more documentation on the functional features of this script, please visit
+# https://github.com/janssenda-adobe/UST-Install-Scripts
+
+# Simple usage: run in powershell
+# (New-Object System.Net.WebClient).DownloadFile("https://git.io/vx8fh","${PWD}\inst.ps1"); .\inst.ps1; rm -Force .\inst.ps1;
+
+# Run this first if execution privileges are required:
+# Set-ExecutionPolicy Bypass -Scope Process;
+
+
+########################################################################################################################
+
+param([String]$pythonVersion="3",
+    [Switch]$cleanpy=$false,
+    [Switch]$offline=$false,
+    [Switch]$testmode=$false,
+    [String]$ustversion="2.2.2")
+
+# Strict mode -- useful for testing, not suited for release
+# Set-StrictMode -Version 2.0 -Verbose
+
+$ErrorActionPreference = "Stop"
+
+# Check the input arguments for problems
+if ($args) {
+    Write-Host "Error: $args not recognized!"
+    exit
+}
 
 if ( -Not ( $ustversion -eq "2.2.2" -or $ustversion -eq "2.3" )) {
     Write-Host "UST Version '$ustversion' - Invalid version (2.2.2 or 2.3 only)"
     exit
 }
 
-if ( -Not ( $py -eq "2" -or $py -eq "3" -or $py -eq "none")) {
-    Write-Host "Py Version '$py' - Invalid version (2 or 3, or none only)"
+if ( -Not ( $pythonVersion -eq "2" -or $pythonVersion -eq "3" -or $pythonVersion -eq "none")) {
+    Write-Host "Py Version '$pythonVersion' - Invalid version (2 or 3, or none only)"
     exit
 }
 
-$pythonVersion = $py
-$ErrorActionPreference = "Stop"
-
-# Array for collecting warnings to display at end of install
-$warnings = New-Object System.Collections.Generic.List[System.Object]
-
-# URL's Combined for convenience here
-
-#Gitlab - Now N/A
-#$notepadURL = "https://gitlab.com/adobe-ust-resources/install-scripts/raw/master/Util/npp.7.5.6.bin.x64.zip"
-#$7ZipURL = "https://gitlab.com/adobe-ust-resources/install-scripts/raw/master/Util/7-Zip64.zip"
-#$openSSLBinURL = "https://gitlab.com/adobe-ust-resources/install-scripts/raw/master/Util/openssl-1.0.2l-x64_86-win64.zip"
-#$openSSLConfigURL = 'https://gitlab.com/adobe-ust-resources/install-scripts/raw/master/Util/openssl.cnf'
-#$adobeIOCertScriptURL = "https://gitlab.com/adobe-ust-resources/install-scripts/raw/master/UST_io_certgen.ps1"
+# These are the collection of URL's that the script must reach to complete successfully.  They are collected at the top of this script
+# for convenience, but are used throughout.  Note that all of the dependencies are collectively stored on the install-scripts repo for
+# forward compatability and resistance to potential external URL changes.  The static resources are stored on the install-scripts repo,
+# (the first block), and the User-Sync related resources are taken from their respective source locations to preserve integrity with
+# respect to build updates and file changes.  Python URL's are also directed to the source, since it is reliable and because we intend
+# to maintain compatibility with the latest versions.
 
 $notepadURL = "https://github.com/janssenda-adobe/UST-Install-Scripts/raw/master/Util/npp.7.5.6.bin.x64.zip"
 $7ZipURL = "https://github.com/janssenda-adobe/UST-Install-Scripts/raw/master/Util/7-Zip64.zip"
@@ -48,16 +81,28 @@ if ( $ustversion -eq "2.3" ) {
     $USTExamplesURL = "https://github.com/adobe-apiplatform/user-sync.py/releases/download/v2.2.1/example-configurations.tar.gz"
 }
 
-# Set global parameters
+# Set global parameters for the script. TLS 1.2 is EXTREMELY important, and is the primary reason the scripts cannot run on
+# older versions of Windows Server.  The effect of a recent change to security on GitHub.com is that all content is now
+# inaccessible unless requests are TLS 1.2 compliant.  This is NOT always the default on Windows, and so must be explicitly set here.
+
 # TLS 1.2 protocol enable - required to download from GitHub, does NOT work on Powershell < 3
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-# Temporary download location
+# Array for collecting warnings to display at end of install.  You can think of this as an exception handler which serves only
+# to carry forward information about possible errors and warnings to the user in a compact informative way at the end of the script.
+
+$warnings = New-Object System.Collections.Generic.List[System.Object]
+
+# Temporary download location - This is where all files are downloaded to, and is deleted as part of the cleanup process at
+# the end of the script.  The location of this folder is determined by Windows.
+
 $DownloadFolder = "$env:TEMP\USTDownload"
 
-# UST folder location
-$USTInstallDir = (Get-Item -Path ".\" -Verbose).FullName.TrimEnd('\')+"\User-Sync-${ustversion}"
+# UST folder location - Here we specify the path for our UST install directory.  The convention is to create the directory
+# in the context of where the script is run from (hence, it is helpful to navigate to your desired folder BEFORE running the script).
+# The naming is User-Sync-2.2.2 for UST 2.2.2 as an example, and User-Sync-$version as a general rule.
 
+$USTInstallDir = (Get-Item -Path ".\" -Verbose).FullName.TrimEnd('\')+"\User-Sync-${ustversion}"
 
 function Print-Color ($msg, $color) {
     Write-Host $msg -ForegroundColor $color
@@ -150,6 +195,7 @@ function Expand-Archive(){
 function Remove-Python(){
     Banner "Uninstalling Python" -type Info
     $errors = $false
+    $matches = $false
 
     # Subkeys from registry for managing installed software state
     $UninstallKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall"
@@ -200,6 +246,8 @@ function Remove-Python(){
     } else {
         Print-Color "`n- Uninstall completed succesfully!" Green
     }
+
+
 }
 
 function Set-Directories(){
@@ -385,6 +433,8 @@ function Get-Python () {
     $install = $FALSE
     $UST_version = 3
     $inst_version = $pythonVersion
+    $p3_installed = $FALSE
+    $p2_installed = $FALSE
 
     # Subkeys from registry for managing installed software state
     $UninstallKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall"
@@ -502,7 +552,7 @@ function Cleanup() {
 if ((New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)){
 
 
-$introBanner = "
+    $introBanner = "
 ==========================================================
 
          _   _                 ___
@@ -512,8 +562,8 @@ $introBanner = "
                                    |__/
 
 "
-$introText=
-"Windows Quick Install 2.0 for UST v2.2.2 - 2.3rc4
+    $introText=
+    "Windows Quick Install 2.0 for UST v2.2.2 - 2.3rc4
 https://github.com/janssenda-adobe/UST-Install-Scripts"
 
     Print-Color $introBanner cyan
