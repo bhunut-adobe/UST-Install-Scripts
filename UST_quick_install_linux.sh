@@ -275,7 +275,7 @@ function extractArchive(){
 }
 
 
-# Packaging function.  This is executed when the --offline flag is used to generate a packaged tar.gz ready for deployment on a target server.
+# Packaging function.  This is executed when the --offline flag is used to generate a packaged tar.gz archive ready for deployment on a target server.
 # This function simply gathers the entire install directory into an archive, and then removes the parent folder.  For more information on the
 # offline packaging feature, see the documentation.
 
@@ -412,7 +412,7 @@ function getUSTFiles(){
     printf "#!/usr/bin/env bash\n./user-sync --users mapped --process-groups" > "$USTFolder/run-user-sync.sh"
 
     # It is also helpful to generate a shell script which can be used to create the public/private key pair needed by User Sync to talk
-    # to the UMAPI. The default lifetime is set oere for 9125 days (25 years) for convenience.  The shell script will prompt the users
+    # to the UMAPI. The default lifetime is set here for 9125 days (25 years) for convenience.  The shell script will prompt the users
     # for specific information, and the deposit certificate_pub.crt and private.key into the install directory.
 
     printColorOS "Generating shell script for certificate generation..."
