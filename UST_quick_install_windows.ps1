@@ -397,8 +397,11 @@ function Remove-Python(){
 # user's specification and choice of User-Sync version will be downloaded and included within the utils folder of the final output directory.
 # In this case, python is NOT installed on the host machine, and the installer ends up inside the final arhive for deployment.
 
+# Since python 3 occasionally fails to install on some systems, the script will automatically switch to python 2 in that case (even if the
+# -py 3 flag is specified).
+
 function Get-Python () {
-    Banner -message "Install Python"
+    Banner -message "Installing Python $pythonversion"
     $install = $FALSE
     $UST_version = 3
     $inst_version = $pythonversion
@@ -484,7 +487,10 @@ function Get-Python () {
                 else
                 {
                     if ($inst_version -eq 3) {
-                        Print-Color "- Error: Python may have failed to install Windows updates for this version of Windows.`n- Update Windows manually or try installing Python 2 instead..." red
+                        Print-Color "- Warning: Python may have failed to install Windows updates for this version of Windows.`Switching to Python 2..." yellow
+                        $pythonversion = 2
+                        Get-Python
+                        return
                     }
 
                     $errmsg = "- Python Installation - Error with ExitCode: $( $pythonProcess.ExitCode )"
@@ -502,6 +508,9 @@ function Get-Python () {
         Write-Host "- Set PEX_ROOT System Environment Variable"
         [Environment]::SetEnvironmentVariable("PEX_ROOT", "$env:SystemDrive\PEX", "Machine")
     }
+
+    return $pythonversion
+
 }
 
 ########################################################################################################################
@@ -523,6 +532,7 @@ function Get-USTFiles () {
     } else {
         $URL = $USTPython3URL
     }
+
 
     # Download UST and Extract
     $USTdownloadList = @()
@@ -763,7 +773,9 @@ https://github.com/janssenda-adobe/UST-Install-Scripts"
     # will skip python installation completely.
     
     try    {
-        if ($pythonversion -ne "none"){ Get-Python }
+        if ($pythonversion -ne "none"){
+            $pythonversion = Get-Python
+        }
     } catch {
         Banner -type Error
         Print-Color "- Failed to install Python with error:" red
@@ -772,43 +784,15 @@ https://github.com/janssenda-adobe/UST-Install-Scripts"
     }
 
     # Get UST and the related files
-    
+
     try    {
-        Get-USTFiles $pythonversion
+        Get-USTFiles
     } catch {
         Banner -type Error
         Print-Color "- Failed to download UST resources with error:" red
         Print-Color ("- " + $PSItem.ToString()) red
         $warnings.Add("- " + $PSItem.ToString())
     }
-
-    ####################################
-    # REMOVE FROM PROD VERSION
-    ####################################
-
-    # User Sync Test Files
-    # This small block runs if the flag -test was specified at runtime.  It retrieves preconfigured .yml files for the perficientads.com
-    # directory and replaces the defaults with them.  This allows you to run the script, and then immediately cd into the install directory
-    # and run User-Sync.  This is a good way to make sure everything has indeed installed correctly and User-Sync runs on the current
-    # platform.  This information is not intended for release to public, and will be stripped out from versions moving to the primary public
-    # repository (yet to be defined).  The entry flag of -test should also be removed.    
-    
-    Print-Color "- Getting test mode files... " blue
-    if ($test) {
-        $download = "https://github.com/janssenda-adobe/UST-Install-Scripts/raw/master/Util/utilities.tar.gz"
-        $downloadfile = "${PWD}\utilities.tar.gz"
-        $wc = New-Object net.webclient
-        $wc.DownloadFile($download, $downloadfile)
-
-        if (Test-Path $downloadfile)
-        {
-            #Extract downloaded file to UST Folder
-            Write-Host "- Extracting $downloadfile to $USTFolder"
-            Expand-Archive -Path $downloadfile -Output $USTFolder
-            Remove-Item -Path $downloadfile -Recurse -Confirm:$false -Force
-        }
-    }
-    #####################################
 
     # Downloading the openSSL files - a loop is used because connection occasionally fails the first time.  After 5 failures, the
     # loop will automaticall terminate.
@@ -835,7 +819,6 @@ https://github.com/janssenda-adobe/UST-Install-Scripts"
     }
 
     # Finalize the installation by creating the batch scripts as described above.
-
     try  {
         Banner -message "Create Batch Scripts"
         Finalize-Installation $openSSLUSTFolder
@@ -845,6 +828,36 @@ https://github.com/janssenda-adobe/UST-Install-Scripts"
         Print-Color ("- " + $PSItem.ToString()) red
         $warnings.Add("- " + $PSItem.ToString())
     }
+
+
+    ####################################
+    # REMOVE FROM PROD VERSION
+    ####################################
+
+    # User Sync Test Files
+    # This small block runs if the flag -test was specified at runtime.  It retrieves preconfigured .yml files for the perficientads.com
+    # directory and replaces the defaults with them.  This allows you to run the script, and then immediately cd into the install directory
+    # and run User-Sync.  This is a good way to make sure everything has indeed installed correctly and User-Sync runs on the current
+    # platform.  This information is not intended for release to public, and will be stripped out from versions moving to the primary public
+    # repository (yet to be defined).  The entry flag of -test should also be removed.
+
+    Print-Color "- Getting test mode files... " blue
+    if ($test) {
+        $download = "https://github.com/janssenda-adobe/UST-Install-Scripts/raw/master/Util/utilities.tar.gz"
+        $downloadfile = "${PWD}\utilities.tar.gz"
+        $wc = New-Object net.webclient
+        $wc.DownloadFile($download, $downloadfile)
+
+        if (Test-Path $downloadfile)
+        {
+            #Extract downloaded file to UST Folder
+            Write-Host "- Extracting $downloadfile to $USTFolder"
+            Expand-Archive -Path $downloadfile -Output $USTFolder
+            Remove-Item -Path $downloadfile -Recurse -Confirm:$false -Force
+        }
+    }
+    #####################################
+
 
     # If the -offline mode was called at runtime, the packager is run at this point.  The packager gathers up the install directory and builds
     # a package archive (see the package function above).  The archive can be easily deployed on a target machine that may not have the rights
@@ -865,9 +878,7 @@ https://github.com/janssenda-adobe/UST-Install-Scripts"
         foreach($w in $warnings){
             Print-Color "$w" red
         }
-
         Write-Host ""
-
     }
 
     Write-Host "- Completed - You can begin to edit configuration files in:`n"
