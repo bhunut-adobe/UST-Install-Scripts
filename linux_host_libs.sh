@@ -205,8 +205,8 @@ function loadUbuntuResources(){
         # This only applies to 17 and 18+, since 2.7 comes by default on previous versions.
         py27Needed=false
         case $hostVersion in
-            17) if [[ ustVer == "2.3" ]]; then py27Needed=true; fi ;;
-            18) if [[ ustVer == "2.2.2" ]]; then py27Needed=true; fi ;;
+            17) if [[ $ustVer == "2.3" ]]; then py27Needed=true; fi ;;
+            18) if [[ $ustVer == "2.2.2" ]]; then py27Needed=true; fi ;;
              *) ;;
         esac
 
@@ -218,8 +218,8 @@ function loadUbuntuResources(){
             while [[ 1 -eq 1 ]]; do
                 read -p "- (y/n)$ " choice
                 case $choice in
-                    "y") installPython=true; ;;
-                    "n") ;;
+                    "y") installPython=true; break;;
+                    "n") break;;
                     *) ;;
                 esac
             done
