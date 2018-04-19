@@ -212,7 +212,7 @@ function loadUbuntuResources(){
 
         # Ask the user for permission to install python 2.7, since there is no way to satisfy the specified requirements without
         # installing python 2.7.
-        if $py27Needed; then
+        if $py27Needed && ! $installPython; then
             printColorOS "Warning: The selected version of UST cannot run your version of Ubuntu unless python 2.7 is installed. " magenta
             printColorOS "Would you like to install python 2.7?\n" magenta
             while [[ 1 -eq 1 ]]; do
