@@ -158,6 +158,8 @@ function loadUbuntuResources(){
     # by inspection of different version installs by the author.
     function verifyHostVersion(){
 
+
+
         if $offlineMode; then
 
             printColor " --- OFFLINE MODE --- "  magenta
@@ -230,10 +232,11 @@ function loadUbuntuResources(){
         # need user help in obtaining  them in order to succeed. ALMOST a dealbreaker for the install, but the install will still
         # succeed if the user can manually place the archives in the script run directory.
 
-        if [[ $hostVersion == 13 && $offline == false ]]; then
+        if [[ $hostVersion -eq 13 && $offlineMode == false ]]; then
             printColorOS "You must download tar.gz files manually on Ubuntu 13... (tls 1.2 not supported) " red
             printColorOS "Place them in the current directory and re-run for automated extraction...\n" red
         fi
+
     }
 
     # Extra repos needed for python 3 install on some Ubuntu versions
