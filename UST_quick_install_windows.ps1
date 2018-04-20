@@ -489,6 +489,7 @@ function Get-Python () {
 
         #Set Environment Variable
         Write-Host "- Set PEX_ROOT System Environment Variable"
+        $env:PEX_ROOT = "$env:SystemDrive\PEX"
         [Environment]::SetEnvironmentVariable("PEX_ROOT", "$env:SystemDrive\PEX", "Machine")
 
     }
