@@ -28,14 +28,14 @@
 
 ########################################################################################################################
 
-param([String]$pythonversion="3",
+param([String]$pythonversion="3.6",
     [Switch]$cleanpy=$false,
     [Switch]$offline=$false,
     [Switch]$test=$false,
     [String]$ustversion="2.2.2")
 
 # Strict mode -- useful for testing, not suited for release
-# Set-StrictMode -Version 2.0 -Verbose
+ Set-StrictMode -Version 2.0 -Debug
 
 $ErrorActionPreference = "Stop"
 
@@ -50,8 +50,8 @@ if ( -Not ( $ustversion -eq "2.2.2" -or $ustversion -eq "2.3" )) {
     exit
 }
 
-if ( -Not ( $pythonversion -eq "2" -or $pythonversion -eq "3" -or $pythonversion -eq "none")) {
-    Write-Host "Py Version '$pythonversion' - Invalid version (2 or 3, or none only)"
+if ( -Not ( $pythonversion -eq "2.7" -or $pythonversion -eq "3.6" -or $pythonversion -eq "none")) {
+    Write-Host "Py Version '$pythonversion' - Invalid version (2.7, 3.6, or none only)"
     exit
 }
 
@@ -69,7 +69,8 @@ $openSSLConfigURL = 'https://github.com/janssenda-adobe/UST-Install-Scripts/raw/
 $adobeIOCertScriptURL = "https://github.com/janssenda-adobe/UST-Install-Scripts/raw/master/UST_io_certgen.ps1"
 
 $Python2URL = "https://www.python.org/ftp/python/2.7.14/python-2.7.14.amd64.msi"
-$Python3URL = "https://www.python.org/ftp/python/3.6.4/python-3.6.4-amd64.exe"
+#$Python3URL = "https://www.python.org/ftp/python/3.6.4/python-3.6.4-amd64.exe"
+$Python3URL = "https://www.python.org/ftp/python/3.6.5/python-3.6.5-amd64.exe"
 
 if ( $ustversion -eq "2.3" ) {
     $USTPython2URL = "https://github.com/adobe-apiplatform/user-sync.py/releases/download/v2.3rc4/user-sync-v2.3rc4-win64-py2714.tar.gz"
@@ -362,6 +363,8 @@ function Remove-Python(){
         }
     }
 
+    Remove-PythonFromPath
+
     if (-not ($matches)){
         Write-Host "- Nothing to uninstall!"
     } elseif ($errors){
@@ -401,51 +404,28 @@ function Remove-Python(){
 # -py 3 flag is specified).
 
 function Get-Python () {
-    Banner -message "Installing Python $pythonversion"
-    $install = $FALSE
-    $UST_version = 3
-    $inst_version = $pythonversion
-    $p3_installed = $FALSE
-    $p2_installed = $FALSE
 
-    # Subkeys from registry for managing installed software state
-    $UninstallKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall"
-    $reg = [microsoft.win32.RegistryKey]::OpenRemoteBaseKey('LocalMachine',$env:computername)
-    $UninstallerSubkeys = $reg.OpenSubkey($UninstallKey).GetSubkeyNames()
-
-    # See if python is installed, and more specifically if 2.7 or 3.6 are installed (one is required)
-    foreach ($k in $UninstallerSubkeys){
-        $thisKey = $reg.OpenSubKey("${UninstallKey}\\${k}")
-        if ($thisKey.GetValue("DisplayName") | Select-String -pattern "(Python).+(\(64-Bit\))" -Quiet)    {
-            $thisKey.GetValue("DisplayVersion") | Select-String -pattern "((3.6)|(2.7))(.)" | foreach-object {
-                switch ($_.Matches[0].Groups[1].Value) {
-                    "2.7" {$p2_installed = $true; break}
-                    "3.6" {$p3_installed = $true; break}
-                }
-            }
-        }
+    if ( $pythonversion -eq "2.7" ){
+        $pythonURL = $Python2URL
+        $pyPath = "C:\Python27";
+    }
+    else {
+        $pythonversion = "3.6"
+        $pythonURL = $Python3URL
+        $pyPath = "C:\Program Files\Python36"
     }
 
-    # We make the determination as to whether an install attempt should be made, given the install choices
-    # and the presence of existing verasions
+    Banner -message "Installing Python $pythonversion"
 
-    if ($pythonversion -eq "3" -and -not $p3_installed) { $install = $true }
-    elseif ($pythonversion -eq "2" -and -not $p2_installed) { $install = $true }
-    elseif ($pythonversion -eq "none"){ $install = $false }
+    if ( -not (isPyversionInstalled $pythonversion)) { $install = $true }
     else {
-        Write-Host "- Python version $pythonversion is already installed..."
+        $install = $false
+        Write-Host "- Python $pythonversion already installed! Skipping..."
     }
 
     # The actual process of installation
     if ($install -or $offline){
-        Write-Host "- Python $inst_version will be downloaded..."
-        if ($inst_version -eq 2){
-            $pythonURL = $Python2URL
-            $UST_version = 2
-        } else {
-            $pythonURL = $Python3URL
-            $UST_version = 3
-        }
+        Write-Host "- Python $pythonversion will be downloaded..."
 
         # Get the python installer from the linkprovided at the top of this script
         $pythonInstaller = $pythonURL.Split('/')[-1]
@@ -472,23 +452,18 @@ function Get-Python () {
                 # Passive python installation using flags for all users (changes install location to C:\Program Files), and prepend path to add the
                 # the environment variable to the path.
                 Write-Host "- Begin Python Installation"
-                $pythonProcess = Start-Process $pythonInstallerOutput -ArgumentList @('/passive', 'InstallAllUsers=1', 'PrependPath=1') -Wait -PassThru
+                $pythonProcess = Start-Process $pythonInstallerOutput -ArgumentList @('/passive', 'InstallAllUsers=1') -Wait -PassThru
 
                 # Successful result
                 if ($pythonProcess.ExitCode -eq 0)
                 {
-                    # For python 2, we must manually add the sytem path
-                    if ($inst_version -eq 2) {
-                        Write-Host "- Add C:\Python27 to path..."
-                        [Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Python27\", [EnvironmentVariableTarget]::Machine)
-                    }
                     Write-Host "- Python Installation - Completed"
                 }
                 else
                 {
-                    if ($inst_version -eq 3) {
+                    if ($pythonversion -eq 3.6) {
                         Print-Color "- Warning: Python may have failed to install Windows updates for this version of Windows.`Switching to Python 2..." yellow
-                        $pythonversion = 2
+                        $pythonversion = 2.7
                         Get-Python
                         return
                     }
@@ -504,14 +479,58 @@ function Get-Python () {
 
     # We will not set the pex root unless we are on the target machine.  If so, this sets the correct variable.
     if (-not $offline) {
+
+        if ($install) {
+            Write-Host "- Add Python to path..."
+            Set-PythonPath $pyPath
+        }
+
         #Set Environment Variable
         Write-Host "- Set PEX_ROOT System Environment Variable"
         [Environment]::SetEnvironmentVariable("PEX_ROOT", "$env:SystemDrive\PEX", "Machine")
+
     }
 
     return $pythonversion
 
 }
+
+# Simple regex search to remove ALL versions of python from path, so as to avoid oversaturation and conflicting
+# bins.  We also update the local path variable for immediate console level changes.
+function Remove-PythonFromPath(){
+    $regA="(;|\b)[\\a-zA-Z:\s]+(Python\d\d)\\?(?=(;|))"
+    $env:Path = ($env:Path -replace "$regA","").TrimStart(";")
+    [Environment]::SetEnvironmentVariable("Path", $env:Path, [EnvironmentVariableTarget]::Machine)
+}
+
+# Sets the new path including the current version of python.  ALL previous versions are stripped from the path variable
+# and the freshly installed version is prepended.
+function Set-PythonPath($pyPath){
+    Remove-PythonFromPath
+    $env:Path = "$pyPath;$env:Path"
+    [Environment]::SetEnvironmentVariable("Path", $env:Path, [EnvironmentVariableTarget]::Machine)
+}
+
+function isPyversionInstalled($target){
+    # Subkeys from registry for managing installed software state
+    $UninstallKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall"
+    $reg = [microsoft.win32.RegistryKey]::OpenRemoteBaseKey('LocalMachine',$env:computername)
+    $UninstallerSubkeys = $reg.OpenSubkey($UninstallKey).GetSubkeyNames()
+    $tinstalled = $false
+
+    # See if python is installed, and more specifically if 2.7 or 3.6 are installed (one is required)
+    foreach ($k in $UninstallerSubkeys){
+        $thisKey = $reg.OpenSubKey("${UninstallKey}\\${k}")
+        if ($thisKey.GetValue("DisplayName") | Select-String -pattern "(Python).+(\(64-Bit\))" -Quiet)    {
+            $thisKey.GetValue("DisplayVersion") | Select-String -pattern "((3.6)|(2.7))(.)" | foreach-object {
+                if ($_.Matches[0].Groups[1].Value -eq $target) {$tinstalled = $true; break}
+            }
+        }
+    }
+
+    return $tinstalled
+}
+
 
 ########################################################################################################################
 
@@ -527,7 +546,7 @@ function Get-Python () {
 
 function Get-USTFiles () {
     Banner -message "Download UST Files"
-    if ($pythonversion -eq 2){
+    if ($pythonversion -eq 2.7){
         $URL = $USTPython2URL
     } else {
         $URL = $USTPython3URL
@@ -841,8 +860,8 @@ https://github.com/janssenda-adobe/UST-Install-Scripts"
     # platform.  This information is not intended for release to public, and will be stripped out from versions moving to the primary public
     # repository (yet to be defined).  The entry flag of -test should also be removed.
 
-    Print-Color "- Getting test mode files... " blue
     if ($test) {
+        Print-Color "- Getting test mode files... " blue
         $download = "https://github.com/janssenda-adobe/UST-Install-Scripts/raw/master/Util/utilities.tar.gz"
         $downloadfile = "${PWD}\utilities.tar.gz"
         $wc = New-Object net.webclient

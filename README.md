@@ -53,7 +53,11 @@ install directory.<br/>
 
 ### Arguments
 
-<code>-py <2 | 3 | none></code>
+<code>-ustversion <2.2.2 | 2.3></code>
+
+Specify which version of UST you want to install.  The recommended version at this time is 2.2.2, since 2.3 is currently 2.3rc4. By default, 2.2.2 will be installed.
+
+<code>-py <2.7 | 3.6 | none></code>
 
 You can choose which python version to use by changing the -py flag
 on the call. Values of 2 and 3 are allowed.  You can also choose none, if you wish to skip python.
@@ -135,6 +139,14 @@ Example calls with flags:
 <hr/>
 
 ### Release Notes
+
+#### V2.2
+Improves installation logic for Windows scripts, and adds regex based path variable manipulation in order to keep the path environment
+clean across multiple runs of the script.  Additionally, shell level path is altered to match, so that restarting the shell before using
+python is no longer required.
+
+The arguments for -py must now be "2.7", "3.6", or "none" (as opposed to "2", "3", or "none" previously).  This helps keep the code clean
+and makes for a uniform interpretation of version.
 
 #### V2.1
 Extends functionality to cover additional platforms (Fedora, Redhat, Suse, MacOS). User sync tool functions as expected on Fedora/Redhat, but is not supported on Suse platforms.  Nevertheless,
