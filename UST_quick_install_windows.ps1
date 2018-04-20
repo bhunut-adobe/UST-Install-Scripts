@@ -480,10 +480,8 @@ function Get-Python () {
     # We will not set the pex root unless we are on the target machine.  If so, this sets the correct variable.
     if (-not $offline) {
 
-        if ($install) {
-            Write-Host "- Add Python to path..."
-            Set-PythonPath $pyPath
-        }
+        Write-Host "- Add Python to path..."
+        Set-PythonPath $pyPath
 
         #Set Environment Variable
         Write-Host "- Set PEX_ROOT System Environment Variable"
