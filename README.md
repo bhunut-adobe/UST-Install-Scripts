@@ -36,20 +36,20 @@ Run the install script:
 
 ### Incudes:
 <ul>
-<li>Python 2.7 or 3.64</li>
+<li>Python 2.7 or 3.6.4</li>
 <li>UST Application and configuration files</li>
 <li>Open SSL for certificate/key generation</li>
 <li>7-Zip portable version for extracting .tar.gz archives</li>
 <li>Notepad++ portable version for better YAML editing </li>
 </ul>
 
-### Generated Batch Files:
+### Generated Files:
 <b>Run_UST_Live.bat:</b> Runs UST in live mode with options -users mapped --process-groups<br/>
 <b>Run_UST_Test.bat:</b> Runs UST in test mode with options -users mapped --process-groups<br/>
 <b>Adobe_IO_Cert_Generation.bat:</b> Located in Utils/OpenSSL, generates a certificate-key pair for use with the UMAPI integration.  Places private.key and certificate.crt in the primary
 install directory.<br/>
 <b>Open_Config_Files.bat:</b> Conveniently opens all the .yml configuration files using the included portable Notepad++ instance.
-<b>examples</b> Directory of example configuration files for reference.
+<b>examples:</b> Directory of example configuration files for reference.
 
 ### Arguments
 
