@@ -416,6 +416,7 @@ function Get-Python () {
     }
 
     Banner -message "Installing Python $pythonversion"
+    $installError = $false
 
     if ( -not (isPyversionInstalled $pythonversion)) { $install = $true }
     else {
@@ -470,6 +471,7 @@ function Get-Python () {
 
                     $errmsg = "- Python Installation - Error with ExitCode: $( $pythonProcess.ExitCode )"
                     Print-Color $errmsg red
+                    $installError = $true
                     $warnings.Add($errmsg)
                     $install = $false
                 }
@@ -480,8 +482,10 @@ function Get-Python () {
     # We will not set the pex root unless we are on the target machine.  If so, this sets the correct variable.
     if (-not $offline) {
 
-        Write-Host "- Add Python to path..."
-        Set-PythonPath $pyPath
+        if (-not $installError) {
+            Write-Host "- Add Python to path..."
+            Set-PythonPath $pyPath
+        }
 
         #Set Environment Variable
         Write-Host "- Set PEX_ROOT System Environment Variable"
