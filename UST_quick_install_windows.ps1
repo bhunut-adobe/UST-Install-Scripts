@@ -69,8 +69,8 @@ $openSSLConfigURL = 'https://github.com/janssenda-adobe/UST-Install-Scripts/raw/
 $adobeIOCertScriptURL = "https://github.com/janssenda-adobe/UST-Install-Scripts/raw/master/UST_io_certgen.ps1"
 
 $Python2URL = "https://www.python.org/ftp/python/2.7.14/python-2.7.14.amd64.msi"
-#$Python3URL = "https://www.python.org/ftp/python/3.6.4/python-3.6.4-amd64.exe"
-$Python3URL = "https://www.python.org/ftp/python/3.6.5/python-3.6.5-amd64.exe"
+$Python3URL = "https://www.python.org/ftp/python/3.6.4/python-3.6.4-amd64.exe"
+#$Python3URL = "https://www.python.org/ftp/python/3.6.5/python-3.6.5-amd64.exe"
 
 if ( $ustversion -eq "2.3" ) {
     $USTPython2URL = "https://github.com/adobe-apiplatform/user-sync.py/releases/download/v2.3rc4/user-sync-v2.3rc4-win64-py2714.tar.gz"
