@@ -710,9 +710,12 @@ python user-sync.pex --process-groups --users mapped
 
 if ((New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)){
 
+    $winVersion = (Get-WmiObject -class Win32_OperatingSystem).Caption
 
     $introBanner = "
 ==========================================================
+$winVersion
+
 
          _   _                 ___
         | | | |___ ___ _ _    / __|_  _ _ _  __
@@ -722,7 +725,7 @@ if ((New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsI
 
 "
     $introText=
-    "Windows Quick Install 2.0 for UST v2.2.2 - 2.3rc4
+    "Windows Quick Install 2.2 for UST v2.2.2 - 2.3rc4
 https://github.com/janssenda-adobe/UST-Install-Scripts"
 
     Print-Color $introBanner cyan
