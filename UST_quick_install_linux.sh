@@ -576,18 +576,18 @@ function getHost(){
             loadResources=loadUbuntuResources
             packageList=(wget nano openssl libssl-dev)
         ;;
-        *cent*|*red*)
+        *cent*)
             installString="yum -y install"
             minVersion="7"
             updateCmd="yum check-update"
             loadResources=loadCentosResources
             packageList=(wget nano openssl)
         ;;
-        *fedora*)
+        *fedora*|*red*)
             installString="yum -y install"
             minVersion="27"
             updateCmd="yum check-update"
-            loadResources=loadCentosResources
+            loadResources=loadFedoraRedhatResources
             packageList=(wget nano openssl)
         ;;
         *suse*)
@@ -692,7 +692,7 @@ function main(){
 
 
     # Install packages if a package manager has been specified
-    [[ $installString != "skip" ]] && getPackages
+    [[ $installString != "skip" && $getUST == "true" ]] && getPackages
 
     # Create the install directory, and then download and extract the UST files into the install directory
     getUSTFiles "$(configureInstallDirectory)"

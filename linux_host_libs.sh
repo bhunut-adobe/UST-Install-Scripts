@@ -431,6 +431,46 @@ function loadCentosResources(){
     return 0
 }
 
+function loadFedoraRedhatResources(){
+
+    if [[ $ustVer == "2.3" ]]; then
+        # UST Version 2.3rc4 Links
+        USTExamplesURL="https://github.com/adobe-apiplatform/user-sync.py/releases/download/v2.3rc4/example-configurations.tar.gz"
+        USTPython2URL="https://github.com/adobe-apiplatform/user-sync.py/releases/download/v2.3rc4/user-sync-2.3rc4-centos7-py275.tar.gz"
+        USTPython3URL="https://github.com/adobe-apiplatform/user-sync.py/releases/download/v2.3rc4/user-sync-2.3rc4-centos7-py364.tar.gz"
+    else
+        # UST Version 2.2.2 Links
+        USTExamplesURL="https://github.com/adobe-apiplatform/user-sync.py/releases/download/v2.2.1/example-configurations.tar.gz"
+        USTPython2URL="https://github.com/adobe-apiplatform/user-sync.py/releases/download/v2.2.2/user-sync-v2.2.2-centos7-py275.tar.gz"
+        USTPython3URL="https://github.com/adobe-apiplatform/user-sync.py/releases/download/v2.2.2/user-sync-v2.2.2-centos7-py362.tar.gz"
+    fi
+
+    function installPython27(){
+        printColorOS "Installing Python 2.7..."
+        $installString python27 &> /dev/null
+        pyCommand="python2.7"
+    }
+
+    function installPython36(){
+        printColorOS "Installing Python 3.6..."
+        $installString python36 &> /dev/null
+        pyCommand="python3.6"
+    }
+
+    function installPython3(){
+        installPython36
+    }
+
+    function choosePythonVersion(){
+        py3V="3.6"
+        $(isPyVersionInstalled $py3V) && pyversion=3 || pyversion=2
+        if $installPython || $offlinePyUpdate ; then pyversion=3; fi
+        if ! $offlinePyUpdate && $offlineMode ; then pyversion=2; fi
+    }
+
+    return 0
+}
+
 function loadMacOsResources(){
 
     if [[ $ustVer == "2.3" ]]; then
