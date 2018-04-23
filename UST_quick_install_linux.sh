@@ -141,7 +141,7 @@ $(tput setaf 5)$fullName $numericalVersion$(tput setaf 6)
                                    |__/
 
 
-$(tput setaf 2)Linux Quick Install 2.0 for UST v2.2.2 - 2.3rc4
+$(tput setaf 2)Linux Quick Install 2.2 for UST v2.2.2 - 2.3rc4
 https://github.com/janssenda-adobe/UST-Install-Scripts    $(tput setaf 6)
 =========================================================$(tput sgr 0)
 EOM
